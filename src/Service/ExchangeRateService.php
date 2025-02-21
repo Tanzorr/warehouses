@@ -9,54 +9,106 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ExchangeRateService
 {
-    private string $apiUrl = 'https://blockchain.info/ticker';
+    private const API_URL = 'https://blockchain.info/ticker';
+    private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'PLN'];
 
     public function __construct(
         private readonly HttpClientInterface    $client,
         private readonly EntityManagerInterface $entityManager,
         private readonly ExchangeRateRepository $rateRepository
-    )
-    {
-    }
+    ) {}
 
     /**
+     * Updates exchange rates by fetching data from an external API.
      *
-     * @throws \DateMalformedStringException
+     * @param int $timeout API request timeout in seconds (default: 30)
      * @throws TransportExceptionInterface
      */
     public function updateRates(int $timeout = 30): void
     {
-        $response = $this->client->request('GET', $this->apiUrl, ['timeout' => $timeout]);
-
-        if ($response->getStatusCode() !== 200) {
-            throw new \Exception('API returned an error status: ' . $response->getStatusCode());
-        }
-
-        $data = $response->toArray();
-        $currencies = ['USD', 'EUR', 'PLN'];
+        $data = $this->fetchExchangeRates($timeout);
 
         foreach ($data as $info) {
-            if (in_array($info['symbol'], $currencies)) {
-                $exchangeRate = (new ExchangeRate())
-                    ->setCurrencyPair('BTC/' . $info['symbol'])
-                    ->setRate((float)$info['last'])
-                    ->setRecordedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-
-                $this->entityManager->persist($exchangeRate);
+            if (!$this->isSupportedCurrency($info['symbol'])) {
+                continue;
             }
+
+            $exchangeRate = $this->createExchangeRate($info['symbol'], (float)$info['last']);
+            $this->entityManager->persist($exchangeRate);
         }
 
         $this->entityManager->flush();
     }
 
+    /**
+     * Retrieves all stored exchange rates.
+     *
+     * @return array Structured exchange rate data
+     */
     public function getRates(): array
     {
         $rates = $this->rateRepository->findAll();
+        return $this->formatRates($rates);
+    }
+
+    /**
+     * Fetches exchange rates from the external API.
+     *
+     * @param int $timeout API request timeout in seconds
+     * @return array Decoded API response
+     * @throws TransportExceptionInterface
+     */
+    private function fetchExchangeRates(int $timeout): array
+    {
+        $response = $this->client->request('GET', self::API_URL, ['timeout' => $timeout]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \RuntimeException('API error: ' . $response->getStatusCode());
+        }
+
+        return $response->toArray();
+    }
+
+    /**
+     * Checks if the given currency is supported.
+     *
+     * @param string $currency Currency code (e.g., USD, EUR)
+     * @return bool True if currency is supported, false otherwise
+     */
+    private function isSupportedCurrency(string $currency): bool
+    {
+        return in_array($currency, self::SUPPORTED_CURRENCIES, true);
+    }
+
+    /**
+     * Creates an ExchangeRate entity with the given data.
+     *
+     * @param string $currency Currency code
+     * @param float $rate Exchange rate value
+     * @return ExchangeRate The created exchange rate entity
+     */
+    private function createExchangeRate(string $currency, float $rate): ExchangeRate
+    {
+        return (new ExchangeRate())
+            ->setCurrencyPair('BTC/' . $currency)
+            ->setRate($rate)
+            ->setRecordedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+    }
+
+    /**
+     * Formats exchange rate data for structured output.
+     *
+     * @param ExchangeRate[] $rates List of exchange rate entities
+     * @return array Formatted exchange rate data
+     */
+    private function formatRates(array $rates): array
+    {
         $rateResponse = [];
 
         foreach ($rates as $rate) {
             $currencyPair = (string) $rate->getCurrencyPair();
             $recordedAt = $rate->getRecordedAt()->format('Y-m-d H:i:s');
+
             $rateResponse[$currencyPair][$recordedAt] = $rate->getRate();
         }
 
