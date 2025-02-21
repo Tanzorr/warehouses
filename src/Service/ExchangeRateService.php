@@ -9,14 +9,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ExchangeRateService
 {
-    private const API_URL = 'https://blockchain.info/ticker';
-    private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'PLN'];
+    private array $supportedCurrenciesExploded;
 
     public function __construct(
         private readonly HttpClientInterface    $client,
         private readonly EntityManagerInterface $entityManager,
-        private readonly ExchangeRateRepository $rateRepository
-    ) {}
+        private readonly ExchangeRateRepository $rateRepository,
+        private readonly string                 $apiUrl,
+        private readonly string                 $supportedCurrencies
+    ) {
+        $this->supportedCurrenciesExploded = explode(',', $this->supportedCurrencies);
+    }
 
     /**
      * Updates exchange rates by fetching data from an external API.
@@ -60,7 +63,7 @@ class ExchangeRateService
      */
     private function fetchExchangeRates(int $timeout): array
     {
-        $response = $this->client->request('GET', self::API_URL, ['timeout' => $timeout]);
+        $response = $this->client->request('GET', $this->apiUrl, ['timeout' => $timeout]);
 
         if ($response->getStatusCode() !== 200) {
             throw new \RuntimeException('API error: ' . $response->getStatusCode());
@@ -77,7 +80,7 @@ class ExchangeRateService
      */
     private function isSupportedCurrency(string $currency): bool
     {
-        return in_array($currency, self::SUPPORTED_CURRENCIES, true);
+        return in_array($currency, $this->supportedCurrenciesExploded, true);
     }
 
     /**
@@ -86,6 +89,7 @@ class ExchangeRateService
      * @param string $currency Currency code
      * @param float $rate Exchange rate value
      * @return ExchangeRate The created exchange rate entity
+     * @throws \DateMalformedStringException
      */
     private function createExchangeRate(string $currency, float $rate): ExchangeRate
     {

@@ -7,10 +7,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class UpdateExchangeRatesCommand extends Command
 {
-    protected static $defaultName = 'update:exchange-rates';
+    protected static string $defaultName = 'update:exchange-rates';
 
     private ExchangeRateService $exchangeRateService;
 
@@ -28,11 +29,14 @@ class UpdateExchangeRatesCommand extends Command
                 'timeout',
                 InputArgument::OPTIONAL,
                 'Timeout duration for the API request (in seconds)',
-                30 // Значення за замовчуванням
+                30 //Default value
             )->setName('app:update-exchange-rates')
             ->setDescription('Updates exchange rates from external API.');;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $timeout = (int)$input->getArgument('timeout');
