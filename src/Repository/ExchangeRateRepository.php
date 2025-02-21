@@ -16,20 +16,20 @@ class ExchangeRateRepository extends ServiceEntityRepository
         parent::__construct($registry, ExchangeRate::class);
     }
 
-    //    /**
-    //     * @return ExchangeRate[] Returns an array of ExchangeRate objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+        /**
+         * @return ExchangeRate[] Returns an array of ExchangeRate objects
+         */
+        public function findByExampleField($value): array
+        {
+            return $this->createQueryBuilder('e')
+                ->andWhere('e.exampleField = :val')
+                ->setParameter('val', $value)
+                ->orderBy('e.id', 'ASC')
+                ->setMaxResults(10)
+                ->getQuery()
+                ->getResult()
+            ;
+        }
 
     //    public function findOneBySomeField($value): ?ExchangeRate
     //    {
