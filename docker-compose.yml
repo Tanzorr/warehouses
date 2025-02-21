@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    ports:
+      - "8088:80"
+    volumes:
+      - .:/var/www/html:cached
+    environment:
+      SYMFONY_ENV: dev
+    depends_on:
+      - db
+    networks:
+      - symfony_network
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - symfony_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root_secret
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - symfony_network
+
+networks:
+  symfony_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
