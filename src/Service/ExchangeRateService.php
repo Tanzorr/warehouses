@@ -6,6 +6,7 @@ use App\Repository\ExchangeRateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class ExchangeRateService
 {
@@ -26,6 +27,7 @@ class ExchangeRateService
      *
      * @param int $timeout API request timeout in seconds (default: 30)
      * @throws TransportExceptionInterface
+     * @throws \DateMalformedStringException
      */
     public function updateRates(int $timeout = 30): void
     {
@@ -36,7 +38,7 @@ class ExchangeRateService
                 continue;
             }
 
-            $exchangeRate = $this->createExchangeRate($info['symbol'], (float)$info['last']);
+            $exchangeRate = $this->createExchangeRate($info['symbol'], (float)$info['last_trade_price']);
             $this->entityManager->persist($exchangeRate);
         }
 
@@ -48,10 +50,24 @@ class ExchangeRateService
      *
      * @return array Structured exchange rate data
      */
-    public function getRates(): array
+    public function getRates(int $page = 1, int $limit = 10): array
     {
-        $rates = $this->rateRepository->findAll();
-        return $this->formatRates($rates);
+        $queryBuilder = $this->rateRepository->createQueryBuilder('r')
+            ->orderBy('r.recordedAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        $paginator = new Paginator($queryBuilder, true);
+        $totalItems = count($paginator);
+        $items = iterator_to_array($paginator);
+
+        return [
+            'total' => $totalItems,
+            'page' => $page,
+            'items_per_page' => $limit,
+            'total_pages' => ceil($totalItems / $limit),
+            'data' => $this->formatRates($items),
+        ];
     }
 
     /**
@@ -94,7 +110,7 @@ class ExchangeRateService
     private function createExchangeRate(string $currency, float $rate): ExchangeRate
     {
         return (new ExchangeRate())
-            ->setCurrencyPair('BTC/' . $currency)
+            ->setCurrencyPair($currency)
             ->setRate($rate)
             ->setRecordedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
     }

@@ -12,7 +12,7 @@ final class ExchangeRateController extends AbstractController
     /**
      * @throws \DateMalformedStringException|\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    #[Route('/exchange/set-rate', name: 'app_exchange_rate')]
+    #[Route('/exchange/set-rates')]
     public function setRate(ExchangeRateService $rateService): JsonResponse
     {
         $rateService->updateRates();
@@ -24,7 +24,7 @@ final class ExchangeRateController extends AbstractController
     }
 
 
-    #[Route('/exchange/get-rate')]
+    #[Route('/exchange/get-rates')]
     public function getRate(ExchangeRateService $rateService): JsonResponse
     {
         return $this->json([$rateService->getRates()]);
