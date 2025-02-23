@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\PaginationRequest;
 use App\Service\ExchangeRateService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -35,12 +36,13 @@ final class ExchangeRateController extends AbstractController
     #[Route('/exchange/get-rates', methods: ['GET'])]
     public function getRates(Request $request, ExchangeRateService $rateService, ValidatorInterface $validator): JsonResponse
     {
-        $input = $this->validateRequest($request, $validator);
-        if (isset($input['errors'])) {
-            return $this->json(['errors' => $input['errors']], Response::HTTP_BAD_REQUEST);
-        }
+        $pagination = new PaginationRequest(
+            $request->query->getInt('page', 1),
+            $request->query->getInt('limit', 10)
+        );
 
-        return $this->json($rateService->getRates($input['page'], $input['limit']));
+        $validated = $validator->validate($pagination);
+        return $this->json($rateService->getRates($pagination->page, $pagination->limit));
     }
 
     #[Route('/exchange/get-rates/{name}', methods: ['GET'])]
