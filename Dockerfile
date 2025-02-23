@@ -1,5 +1,5 @@
 # Використовуємо офіційний образ PHP-FPM з PHP 8.2
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 # Встановлюємо необхідні системні залежності для Symfony та cron
 RUN apt-get update && apt-get install -y \
@@ -31,5 +31,7 @@ COPY crontab /etc/cron.d/cron-schedule
 RUN chmod 0644 /etc/cron.d/cron-schedule
 
 RUN crontab /etc/cron.d/cron-schedule
+
+RUN apt-get update && apt-get install -y libcurl4-openssl-dev pkg-config libpcre3-dev  && docker-php-ext-install curl
 
 CMD ["sh", "-c", "cron && php-fpm"]
