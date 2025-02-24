@@ -29,11 +29,6 @@ class ExchangeRate
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTimeInterface $recordedAt = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getCurrencyPair(): ?string
     {
         return $this->currencyPair;
