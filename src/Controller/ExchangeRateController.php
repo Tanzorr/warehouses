@@ -25,6 +25,14 @@ final class ExchangeRateController extends AbstractController
         private readonly ExchangeRateRequestHandler $requestHandler
     ) {}
 
+    /**
+     * @throws \DateMalformedStringException
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     #[Route('/exchange/set-rates')]
     public function setRate(): JsonResponse
     {
