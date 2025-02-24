@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\DTO\PaginationRequest;
+use App\Service\ExchangeRateRequestHandler;
 use App\Service\ExchangeRateService;
 use App\Service\RequestValidator;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +19,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ExchangeRateController extends AbstractController
 {
+
+    public function __construct(
+        private  ExchangeRateService $rateService,
+        private  ExchangeRateRequestHandler $requestHandler
+    ) {}
+
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
@@ -34,21 +40,13 @@ final class ExchangeRateController extends AbstractController
     }
 
     #[Route('/exchange/get-rates', methods: ['GET'])]
-    public function getRates(Request $request, ExchangeRateService $rateService, RequestValidator $validator): JsonResponse
+    public function getRates(Request $request): JsonResponse
     {
 
-        $pagination = new PaginationRequest(
-            $request->query->getInt('page', 1),
-            $request->query->getInt('limit', 10)
-        );
-
-        $validated = $validator->validate($pagination);
-
-        if (is_array($validated)) {
-            return $this->json(['errors' => $validated], Response::HTTP_BAD_REQUEST);
-        }
-
-        return $this->json($rateService->getRates($pagination->page, $pagination->limit));
+        $data = $this->requestHandler->handleGetRates($request);
+        return isset($data['errors'])
+            ? $this->json($data, Response::HTTP_BAD_REQUEST)
+            : $this->json($data);
     }
 
     #[Route('/exchange/get-rates/{name}', methods: ['GET'])]

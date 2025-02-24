@@ -31,7 +31,7 @@ class ExchangeRateService
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws ClientExceptionInterface|\DateMalformedStringException
      */
     public function updateRates(int $timeout = 30): void
     {
