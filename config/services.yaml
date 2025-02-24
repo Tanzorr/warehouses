@@ -27,5 +27,13 @@ services:
             $apiUrl: '%exchange_rate.api_url%'
             $supportedCurrencies: '%exchange_rate.supported_currencies%'
 
+
+    App\Service\RequestValidator:
+            arguments:
+                $validator: '@validator'
+    App\Service\ExchangeRateRequestHandler:
+        arguments:
+            $rateService: '@App\Service\ExchangeRateService'
+            $validator: '@App\Service\RequestValidator'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
