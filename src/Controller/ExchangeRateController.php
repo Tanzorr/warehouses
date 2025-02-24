@@ -16,13 +16,14 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
-
+use Symfony\Component\Serializer\SerializerInterface;
 final class ExchangeRateController extends AbstractController
 {
 
     public function __construct(
         private  ExchangeRateService $rateService,
-        private readonly ExchangeRateRequestHandler $requestHandler
+        private readonly ExchangeRateRequestHandler $requestHandler,
+        private readonly SerializerInterface $serializer
     ) {}
 
     /**
