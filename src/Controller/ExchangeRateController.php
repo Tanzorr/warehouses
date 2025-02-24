@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\DTO\PaginationRequest;
 use App\Service\ExchangeRateRequestHandler;
 use App\Service\ExchangeRateService;
-use App\Service\RequestValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,10 +20,9 @@ final class ExchangeRateController extends AbstractController
 {
 
     public function __construct(
-        private  ExchangeRateService $rateService,
-        private readonly ExchangeRateRequestHandler $requestHandler,
-        private readonly SerializerInterface $serializer
-    ) {}
+        private readonly ExchangeRateService        $rateService,
+        private readonly ExchangeRateRequestHandler $requestHandler
+ ) {}
 
     /**
      * @throws \DateMalformedStringException
