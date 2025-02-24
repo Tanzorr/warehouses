@@ -12,33 +12,17 @@ class ExchangeRateRequestHandler
         private readonly RequestValidator $validator
     ) {}
 
-    public function handleGetRates(Request $request): array
+    public function handleGetRates(PaginationRequest $pagination): array
     {
-        return $this->processRequest($request, fn($pagination) =>
-        $this->rateService->getRates($pagination->page, $pagination->limit)
-        );
-    }
-
-    public function handleGetRate(Request $request, string $name): array
-    {
-        return $this->processRequest($request, fn($pagination) =>
-        $this->rateService->getRate($name, $pagination->page, $pagination->limit)
-        );
-    }
-
-    private function processRequest(Request $request, callable $callback): array
-    {
-        $pagination = self::createPaginationRequest($request);
         $validated = $this->validator->validate($pagination);
 
-        return is_array($validated) ? ['errors' => $validated] : $callback($validated);
+        return is_array($validated) ? ['errors' => $validated] : $this->rateService->getRates($validated->page, $validated->limit);
     }
 
-    private static function createPaginationRequest(Request $request): PaginationRequest
+    public function handleGetRate(PaginationRequest $pagination, string $name): array
     {
-        return new PaginationRequest(
-            $request->query->getInt('page', 1),
-            $request->query->getInt('limit', 10)
-        );
+        $validated = $this->validator->validate($pagination);
+
+        return is_array($validated) ? ['errors' => $validated] : $this->rateService->getRate($name, $validated->page, $validated->limit);
     }
 }
