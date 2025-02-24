@@ -52,13 +52,18 @@ final class ExchangeRateController extends AbstractController
     }
 
     #[Route('/exchange/get-rates/{name}', methods: ['GET'])]
-    public function getRate(string $name, Request $request, ExchangeRateService $rateService, ValidatorInterface $validator): JsonResponse
+    public function getRate(string $name, Request $request, ExchangeRateService $rateService, RequestValidator $validator): JsonResponse
     {
         $pagination = new PaginationRequest(
             $request->query->getInt('page', 1),
             $request->query->getInt('limit', 10)
         );
-        $validator->validate($pagination);
+
+        $validated = $validator->validate($pagination);
+
+        if (is_array($validated)) {
+            return $this->json(['errors' => $validated], Response::HTTP_BAD_REQUEST);
+        }
 
         return $this->json($rateService->getRate($name, $pagination->page, $pagination->limit));
     }
