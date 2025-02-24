@@ -24,8 +24,4 @@ composer install
 php bin/console doctrine:migrations:migrate
 
 service cron start
-
-
-
-
 ```
