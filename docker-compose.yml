@@ -4,13 +4,15 @@ services:
     ports:
       - "8088:80"
     volumes:
-      - .:/var/www/html:cached
+      - .:/var/www/html
+    working_dir: /var/www/html
     environment:
       SYMFONY_ENV: dev
     depends_on:
       - db
     networks:
       - symfony_network
+    command: php -S 0.0.0.0:80 -t public
 
   db:
     image: mysql:5.7
