@@ -8,12 +8,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class WerehouseController extends AbstractController
 {
-    #[Route('/werehouse', name: 'app_werehouse')]
+    #[Route('/warehouse', name: 'app_warehouse')]
     public function index(): JsonResponse
     {
         return $this->json([
             'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/WerehouseController.php',
+            'path' => 'src/Controller/WarehouseController.php',
         ]);
     }
 }
