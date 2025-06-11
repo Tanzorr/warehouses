@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CategroyRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+#[ApiResource]
 #[ORM\Entity(repositoryClass: CategroyRepository::class)]
-class Categroy
+class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

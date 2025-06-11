@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\WarehouseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: WarehouseRepository::class)]
 class Warehouse
 {
@@ -14,7 +16,7 @@ class Warehouse
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Warehause = null;
+    private ?string $Warehouse = null;
 
     #[ORM\Column(length: 1000)]
     private ?string $description = null;
@@ -27,14 +29,14 @@ class Warehouse
         return $this->id;
     }
 
-    public function getWarehause(): ?string
+    public function getWarehouse(): ?string
     {
-        return $this->Warehause;
+        return $this->Warehouse;
     }
 
-    public function setWarehause(string $Warehause): static
+    public function setWarehouse(string $Warehouse): static
     {
-        $this->Warehause = $Warehause;
+        $this->Warehouse = $Warehouse;
 
         return $this;
     }
