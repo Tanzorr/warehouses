@@ -1724,11 +1724,11 @@
             "get": {
                 "operationId": "api_users_get_collection",
                 "tags": [
-                    "User"
+                    "UserFixture"
                 ],
                 "responses": {
                     "200": {
-                        "description": "User collection",
+                        "description": "UserFixture collection",
                         "content": {
                             "application/ld+json": {
                                 "schema": {
@@ -1826,8 +1826,8 @@
                         }
                     }
                 },
-                "summary": "Retrieves the collection of User resources.",
-                "description": "Retrieves the collection of User resources.",
+                "summary": "Retrieves the collection of UserFixture resources.",
+                "description": "Retrieves the collection of UserFixture resources.",
                 "parameters": [
                     {
                         "name": "page",
@@ -1850,11 +1850,11 @@
             "post": {
                 "operationId": "api_users_post",
                 "tags": [
-                    "User"
+                    "UserFixture"
                 ],
                 "responses": {
                     "201": {
-                        "description": "User resource created",
+                        "description": "UserFixture resource created",
                         "content": {
                             "application/ld+json": {
                                 "schema": {
@@ -1907,11 +1907,11 @@
                         "links": {}
                     }
                 },
-                "summary": "Creates a User resource.",
-                "description": "Creates a User resource.",
+                "summary": "Creates a UserFixture resource.",
+                "description": "Creates a UserFixture resource.",
                 "parameters": [],
                 "requestBody": {
-                    "description": "The new User resource",
+                    "description": "The new UserFixture resource",
                     "content": {
                         "application/ld+json": {
                             "schema": {
@@ -1928,11 +1928,11 @@
             "get": {
                 "operationId": "api_users_id_get",
                 "tags": [
-                    "User"
+                    "UserFixture"
                 ],
                 "responses": {
                     "200": {
-                        "description": "User resource",
+                        "description": "UserFixture resource",
                         "content": {
                             "application/ld+json": {
                                 "schema": {
@@ -1963,13 +1963,13 @@
                         "links": {}
                     }
                 },
-                "summary": "Retrieves a User resource.",
-                "description": "Retrieves a User resource.",
+                "summary": "Retrieves a UserFixture resource.",
+                "description": "Retrieves a UserFixture resource.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "User identifier",
+                        "description": "UserFixture identifier",
                         "required": true,
                         "deprecated": false,
                         "allowEmptyValue": false,
@@ -1986,11 +1986,11 @@
             "delete": {
                 "operationId": "api_users_id_delete",
                 "tags": [
-                    "User"
+                    "UserFixture"
                 ],
                 "responses": {
                     "204": {
-                        "description": "User resource deleted"
+                        "description": "UserFixture resource deleted"
                     },
                     "404": {
                         "description": "Not found",
@@ -2014,13 +2014,13 @@
                         "links": {}
                     }
                 },
-                "summary": "Removes the User resource.",
-                "description": "Removes the User resource.",
+                "summary": "Removes the UserFixture resource.",
+                "description": "Removes the UserFixture resource.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "User identifier",
+                        "description": "UserFixture identifier",
                         "required": true,
                         "deprecated": false,
                         "allowEmptyValue": false,
@@ -2037,11 +2037,11 @@
             "patch": {
                 "operationId": "api_users_id_patch",
                 "tags": [
-                    "User"
+                    "UserFixture"
                 ],
                 "responses": {
                     "200": {
-                        "description": "User resource updated",
+                        "description": "UserFixture resource updated",
                         "content": {
                             "application/ld+json": {
                                 "schema": {
@@ -2115,13 +2115,13 @@
                         "links": {}
                     }
                 },
-                "summary": "Updates the User resource.",
-                "description": "Updates the User resource.",
+                "summary": "Updates the UserFixture resource.",
+                "description": "Updates the UserFixture resource.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "User identifier",
+                        "description": "UserFixture identifier",
                         "required": true,
                         "deprecated": false,
                         "allowEmptyValue": false,
@@ -2134,7 +2134,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "The updated User resource",
+                    "description": "The updated UserFixture resource",
                     "content": {
                         "application/merge-patch+json": {
                             "schema": {
@@ -3503,7 +3503,7 @@
             "name": "ProductReservation"
         },
         {
-            "name": "User"
+            "name": "UserFixture"
         },
         {
             "name": "Warehouse"
