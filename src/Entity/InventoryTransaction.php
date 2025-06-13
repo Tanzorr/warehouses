@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
+use AllowDynamicProperties;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-#[ApiResource]
+#[AllowDynamicProperties] #[ApiResource]
 #[ORM\Entity]
 class InventoryTransaction
 {
@@ -13,8 +14,15 @@ class InventoryTransaction
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 50)]
+    private string $sourceType;
+
     #[ORM\Column]
-    private ?int $product_id = null;
+    private int $sourceId;
+
+    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Product $product;
 
     #[ORM\Column]
     private ?int $quantity = null;
@@ -27,6 +35,25 @@ class InventoryTransaction
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
+
+    public function __construct(
+        ?int $id = null,
+        int $sourceId = 0,
+        Product $product = null,
+        ?int $quantity = null,
+        ?\DateTimeImmutable $created_at = null,
+        ?int $warehouse_id = null,
+        ?string $comment = null
+    )
+    {
+        $this->product = $product;
+        $this->id = $id;
+        $this->sourceId = $sourceId;
+        $this->quantity = $quantity;
+        $this->created_at = $created_at ?? new \DateTimeImmutable();
+        $this->warehouse_id = $warehouse_id;
+        $this->comment = $comment;
+    }
 
     public function getId(): ?int
     {

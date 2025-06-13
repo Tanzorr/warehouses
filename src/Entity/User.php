@@ -5,13 +5,13 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,11 +30,9 @@ class User
     #[ORM\Column(type: Types::ARRAY)]
     private array $role = [];
 
-    /**
-     * @var Collection<int, Order>
-     */
-    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $status;
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
+
 
     public function __construct()
     {
@@ -101,32 +99,14 @@ class User
         return $this;
     }
 
-    /**
-     * @return Collection<int, Order>
-     */
-    public function getStatus(): Collection
+    public function getPassword(): ?string
     {
-        return $this->status;
+        return $this->password;
     }
 
-    public function addStatus(Order $status): static
+    public function setPassword(string $password): static
     {
-        if (!$this->status->contains($status)) {
-            $this->status->add($status);
-            $status->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStatus(Order $status): static
-    {
-        if ($this->status->removeElement($status)) {
-            // set the owning side to null (unless already changed)
-            if ($status->getUser() === $this) {
-                $status->setUser(null);
-            }
-        }
+        $this->password = $password;
 
         return $this;
     }

@@ -4,8 +4,6 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,15 +40,11 @@ class Product
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
-    /**
-     * @var Collection<int, OrderItem>
-     */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'product')]
-    private Collection $quantity;
+
 
     public function __construct()
     {
-        $this->quantity = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -150,36 +144,6 @@ class Product
     public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, OrderItem>
-     */
-    public function getQuantity(): Collection
-    {
-        return $this->quantity;
-    }
-
-    public function addQuantity(OrderItem $quantity): static
-    {
-        if (!$this->quantity->contains($quantity)) {
-            $this->quantity->add($quantity);
-            $quantity->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeQuantity(OrderItem $quantity): static
-    {
-        if ($this->quantity->removeElement($quantity)) {
-            // set the owning side to null (unless already changed)
-            if ($quantity->getProduct() === $this) {
-                $quantity->setProduct(null);
-            }
-        }
 
         return $this;
     }
