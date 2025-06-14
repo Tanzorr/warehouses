@@ -2,43 +2,50 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Category;
+use App\Entity\Product;
+use App\Entity\Warehouse;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
-class ProductFixture extends Fixture
+class ProductFixture extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create();
 
-        $categories = [];
-
-        for ($i = 0; $i < 10; $i++) {
-            $category = new \App\Entity\Category();
-            $category->setName($faker->word);
-            $manager->persist($category);
-            $categories[] = $category;
-        }
-
+        $warehouses = $manager->getRepository(Warehouse::class)->findAll();
+        $categories = $manager->getRepository(Category::class)->findAll();
 
         for ($i = 0; $i < 100; $i++) {
-
-
-            $product = new \App\Entity\Product();
+            $product = new Product();
             $product->setName($faker->word);
             $product->setDescription($faker->sentence);
             $product->setPrice($faker->randomFloat(2, 1, 1000));
             $product->setStockQuantity($faker->numberBetween(0, 100));
-            $product->setSKU($faker->unique()->word);
-            $product->setCategoryId($faker->numberBetween(1, 10));
+            $product->setSku($faker->unique()->word); // SKU (не all caps у методі)
             $product->setCreatedAt(new \DateTimeImmutable());
             $product->setUpdatedAt(new \DateTimeImmutable());
-            $product->setWearhouseId($faker->numberBetween(1, 10));
+
+            $randomCategory = $categories[array_rand($categories)];
+            $product->setCategoryId($randomCategory->getId());
+            $randomWarehouse = $warehouses[array_rand($warehouses)];
+            $product->setWearhouseId($randomWarehouse->getId());
 
             $manager->persist($product);
         }
 
         $manager->flush();
     }
+
+    public function getDependencies(): array
+    {
+        return [
+            CategoryFixture::class,
+            WarehouseFixture::class,
+        ];
+    }
 }
+
