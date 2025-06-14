@@ -18,7 +18,6 @@ class WarehouseFixture extends Fixture
             $warehouse->setWarehouse('Warehouse ' . ($i + 1));
             $warehouse->setDescription('Description for Warehouse ' . ($i + 1));
             $warehouse->setLocation('Location ' . ($i + 1));
-
             $manager->persist($warehouse);
        }
 

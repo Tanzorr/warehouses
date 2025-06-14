@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use AllowDynamicProperties;
-use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-#[AllowDynamicProperties] #[ApiResource]
+
+
+
+#[AllowDynamicProperties]
 #[ORM\Entity]
 class InventoryTransaction
 {

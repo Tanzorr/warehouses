@@ -3,9 +3,19 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use App\Controller\InventoryTransactionController;
+use App\Controller\ProductReservationController;
+use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource]
+#[ApiResource(operations: [
+    new Post(routeName: 'app_product_reserve',
+        controller: ProductReservationController::class,
+        input: ReserveInput::class,
+        name: 'app_product_reserve'
+    ),
+])]
 #[ORM\Entity]
 class ProductReservation
 {
