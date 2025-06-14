@@ -32,13 +32,16 @@ class Product
     private ?string $SKU = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Category = null;
+    private ?int $CategoryId = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column]
+    private ?int $wearhouse_id = null;
 
 
 
@@ -112,14 +115,14 @@ class Product
         return $this;
     }
 
-    public function getCategory(): ?string
+    public function getCategoryId(): ?int
     {
-        return $this->Category;
+        return $this->CategoryId;
     }
 
-    public function setCategory(string $Category): static
+    public function setCategoryId(int $CategoryId): static
     {
-        $this->Category = $Category;
+        $this->CategoryId = $CategoryId;
 
         return $this;
     }
@@ -144,6 +147,18 @@ class Product
     public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getWearhouseId(): ?int
+    {
+        return $this->wearhouse_id;
+    }
+
+    public function setWearhouseId(int $wearhouse_id): static
+    {
+        $this->wearhouse_id = $wearhouse_id;
 
         return $this;
     }
