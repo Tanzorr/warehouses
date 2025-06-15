@@ -4,10 +4,11 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
-use App\Controller\InventoryTransactionController;
 use App\Controller\ProductReservationController;
 use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ApiResource(operations: [
     new Post(routeName: 'app_product_reserve',
@@ -16,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
         name: 'app_product_reserve'
     ),
 ])]
+#[ApiResource]
 #[ORM\Entity]
 class ProductReservation
 {
@@ -25,9 +27,13 @@ class ProductReservation
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\Type('integer')]
     private ?int $product_id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\Type('integer')]
     private ?int $quantity = null;
 
     #[ORM\Column]

@@ -5,8 +5,6 @@ namespace App\Entity;
 use AllowDynamicProperties;
 use Doctrine\ORM\Mapping as ORM;
 
-
-
 #[AllowDynamicProperties]
 #[ORM\Entity]
 class InventoryTransaction
@@ -16,18 +14,8 @@ class InventoryTransaction
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    private string $sourceType;
-
     #[ORM\Column]
-    private int $sourceId;
-
-    #[ORM\ManyToOne(targetEntity: Product::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private Product $product;
-
-    #[ORM\Column]
-    private ?int $quantity = null;
+    private ?int $reservationId = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -40,20 +28,15 @@ class InventoryTransaction
 
     public function __construct(
         ?int $id = null,
-        int $sourceId = 0,
-        Product $product = null,
-        ?int $quantity = null,
+        ?int $reservation_id = null,
         ?\DateTimeImmutable $created_at = null,
         ?int $warehouse_id = null,
         ?string $comment = null
-    )
-    {
-        $this->product = $product;
+    ) {
         $this->id = $id;
-        $this->sourceId = $sourceId;
-        $this->quantity = $quantity;
-        $this->created_at = $created_at ?? new \DateTimeImmutable();
+        $this->created_at = $created_at ?: new \DateTimeImmutable();
         $this->warehouse_id = $warehouse_id;
+        $this->reservationId = $reservation_id ?? 0;
         $this->comment = $comment;
     }
 
@@ -68,25 +51,14 @@ class InventoryTransaction
         return $this;
     }
 
-    public function getProductId(): ?int
+    public function getReservationId(): ?int
     {
-        return $this->product_id;
+        return $this->reservationId;
     }
 
-    public function setProductId(int $product_id): static
+    public function setReservationId(int $reservation_id): static
     {
-        $this->product_id = $product_id;
-        return $this;
-    }
-
-    public function getQuantity(): ?int
-    {
-        return $this->quantity;
-    }
-
-    public function setQuantity(int $quantity): static
-    {
-        $this->quantity = $quantity;
+        $this->reservationId = $reservation_id;
         return $this;
     }
 

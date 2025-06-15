@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\InventoryTransaction;
 use App\Entity\Product;
 use App\Entity\ProductReservation;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +16,11 @@ class ReservationService
     /**
      * @throws \Exception
      */
-    public function reserve(int $productId, int $quantity): string
+    public function reserve(
+        int $productId,
+        int $warehouseId,
+        int $quantity
+    ): string
     {
         try {
             $product = $this->getProduct($productId);
@@ -30,10 +35,25 @@ class ReservationService
 
             $this->em->persist($productReservation);
             $this->em->flush();
-
+            $productReservationId = $productReservation->getId();
+            $this->andTransaction($warehouseId, $productReservationId);
             return 'Reservation successful.';
         } catch (\Exception $e) {
             return 'Error: ' . $e->getMessage();
+        }
+    }
+
+    private function andTransaction(int $warehouseId, int $reservationId): void
+    {
+        try {
+            $transaction = new InventoryTransaction();
+            $transaction->setWarehouseId($warehouseId);
+            $transaction->setReservationId($reservationId);
+            $this->em->persist($transaction);
+            $this->em->flush();
+            return;
+        }catch (\Exception $e){
+            return;
         }
     }
     private function getProduct(int $productId): Product

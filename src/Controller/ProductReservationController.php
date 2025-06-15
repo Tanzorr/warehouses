@@ -32,7 +32,7 @@ final class ProductReservationController extends AbstractController
     public function reserve(Request $request): JsonResponse
     {
         $data = $request->toArray();
-        $result = $this->reservationService->reserve($data['productId'], $data['quantity']);
+        $result = $this->reservationService->reserve($data['productId'], $data['warehouseId'], $data['quantity']);
 
         return new JsonResponse(['message' => $result]);
     }
