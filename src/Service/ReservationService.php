@@ -15,31 +15,58 @@ class ReservationService
     /**
      * @throws \Exception
      */
-    public function reserve(int $productId, int $quantity): void
+    public function reserve(int $productId, int $quantity): string
+    {
+        try {
+            $product = $this->getProduct($productId);
+            $this->assertSufficientStock($product, $quantity);
+            $this->assertSufficientAvailableAfterReservations($product, $quantity);
+
+            $productReservation = (new ProductReservation())
+                ->setProductId($product->getId())
+                ->setQuantity($quantity)
+                ->setReservedAt(new \DateTimeImmutable())
+                ->setComment('Reserved by user');
+
+            $this->em->persist($productReservation);
+            $this->em->flush();
+
+            return 'Reservation successful.';
+        } catch (\Exception $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    }
+    private function getProduct(int $productId): Product
     {
         $product = $this->em->getRepository(Product::class)->find($productId);
-        $availableQuantity = $product->getStockQuantity();
-        if($availableQuantity < $quantity) {
+        if (!$product) {
+            throw new \Exception('Product not found.');
+        }
+        return $product;
+    }
+
+    private function assertSufficientStock(Product $product, int $quantity): void
+    {
+        if ($product->getStockQuantity() < $quantity) {
             throw new \Exception('Not enough stock available for reservation.');
         }
+    }
 
-        $reservations = $this->em->getRepository(ProductReservation::class)->findBy(['product_id' => $product->getId()]);
-        $reservedQuantity = array_reduce($reservations, function (float $carry, ProductReservation $reservation) {
-            return $carry + $reservation->getQuantity();
-        }, 0.0);
+    private function getReservedQuantity(Product $product): float
+    {
+        $reservations = $this->em->getRepository(ProductReservation::class)
+            ->findBy(['product_id' => $product->getId()]);
+        return array_sum(array_map(
+            fn(ProductReservation $reservation) => $reservation->getQuantity(),
+            $reservations
+        ));
+    }
 
-        $totalAvailableQuantity = $availableQuantity - $reservedQuantity;
-        if ($totalAvailableQuantity < $quantity) {
+    private function assertSufficientAvailableAfterReservations(Product $product, int $quantity): void
+    {
+        $available = $product->getStockQuantity() - $this->getReservedQuantity($product);
+        if ($available < $quantity) {
             throw new \Exception('Not enough stock available after considering existing reservations.');
         }
-
-        // Create a new ProductReservation entity
-        $productReservation = new ProductReservation();
-        $productReservation->setProductId($product->getId());
-        $productReservation->setQuantity($quantity);
-        $productReservation->setReservedAt(new \DateTimeImmutable());
-        $productReservation->setComment('Reserved by user'); // You can customize this comment as needed
-        $this->em->persist($productReservation);
-        $this->em->flush();
     }
 }
