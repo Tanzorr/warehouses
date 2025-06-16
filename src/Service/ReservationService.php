@@ -6,12 +6,14 @@ use App\Entity\Product;
 use App\Entity\ProductReservation;
 use App\Repository\ProductRepository;
 use App\Repository\ProductReservationRepository;
+use App\Repository\WarehouseRepository;
 
 class ReservationService
 {
     public function __construct(
         private readonly ProductReservationRepository $reservationRepository,
         private readonly ProductRepository            $productRepository,
+        private readonly WarehouseRepository     $warehouseRepository,
     )
     {
     }
@@ -19,22 +21,21 @@ class ReservationService
     /**
      * @throws \Exception
      */
-    public function reserve(
-        int $productId,
-        int $warehouseId,
-        int $quantity
-    ): string
+    public function reserve(array $data): string
     {
         try {
-            $product = $this->productRepository->getOrFail($productId);
+            $productId = $data['product_id'] ?? null;
+            $quantity = $data['quantity'] ?? 0;
+            $product = $this->productRepository->getOrFailById($productId);
+            $warehouse = $this->warehouseRepository->getOrFailByTitle($data['warehouse_title']);
             $this->assertSufficientStock($product, $quantity);
             $this->assertSufficientAvailableAfterReservations($product, $quantity);
 
             $productReservation = $this->reservationRepository->create(
                 $product,
-                $warehouseId,
-                $quantity,
-                'Product reservation for product ID ' . $productId . ' in warehouse ID ' . $warehouseId
+                $warehouse->getId(),
+                $data['quantity'],
+                $data['comment'] ?? null
             );
             $this->reservationRepository->save($productReservation);
             return 'Reservation successful.';

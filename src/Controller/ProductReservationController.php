@@ -28,11 +28,11 @@ final class ProductReservationController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/product/reservation', name: 'app_product_reserve', methods: ['POST'])]
-    public function reserve(Request $request): JsonResponse
+    #[Route('/product/reservation', name: 'app_product_reserve_add', methods: ['POST'])]
+    public function add(Request $request): JsonResponse
     {
         $data = $request->toArray();
-        $result = $this->reservationService->reserve($data['productId'], $data['warehouseId'], $data['quantity']);
+        $result = $this->reservationService->reserve($data);
 
         return new JsonResponse(['message' => $result]);
     }

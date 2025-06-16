@@ -16,6 +16,21 @@ class WarehouseRepository extends ServiceEntityRepository
         parent::__construct($registry, Warehouse::class);
     }
 
+    public function getOrFailByTitle(string $warehouseTitle): Warehouse|null
+    {
+        $warehouse = $this->createQueryBuilder('w')
+            ->where('w.Warehouse = :warehouseTitle')
+            ->setParameter('warehouseTitle', $warehouseTitle)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$warehouse) {
+            throw new \Exception('Warehouse not found');
+        }
+
+        return $warehouse;
+    }
+
     //    /**
     //     * @return Warehouse[] Returns an array of Warehouse objects
     //     */

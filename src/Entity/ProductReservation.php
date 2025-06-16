@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ApiResource(operations: [
-    new Post(routeName: 'app_product_reserve',
+    new Post(routeName: 'app_product_reserve_add',
         controller: ProductReservationController::class,
         input: ReserveInput::class,
         name: 'app_product_reserve'
