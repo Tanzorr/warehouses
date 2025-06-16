@@ -16,6 +16,15 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function getOrFail(int $productId): Product|null
+    {
+        $product = $this->find($productId);
+        if (!$product) {
+            throw new \Exception('Product not found');
+        }
+        return $product;
+    }
+
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */

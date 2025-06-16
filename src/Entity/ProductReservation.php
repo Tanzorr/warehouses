@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Post;
 use App\Controller\ProductReservationController;
 use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -41,6 +42,11 @@ class ProductReservation
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $released_at = null;
+
+    #[ORM\Column]
+    #[Assert\Type('integer')]
+    #[Assert\NotBlank]
+    private ?int $warehouse_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
@@ -94,6 +100,16 @@ class ProductReservation
         return $this;
     }
 
+    public function getWarehouseId(): ?int
+    {
+        return $this->warehouse_id;
+    }
+
+    public function setWarehouseId(int $warehouse_id): self
+    {
+        $this->warehouse_id = $warehouse_id;
+        return $this;
+    }
     public function getComment(): ?string
     {
         return $this->comment;

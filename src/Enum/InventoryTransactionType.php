@@ -2,8 +2,8 @@
 
 namespace App\Enum;
 
-enum InventoryTransactionType: string
+class InventoryTransactionType
 {
-    case ORDER_RESERVATION = 'order_reservation';
-    case PAYMENT_DELIVERY = 'payment_delivery';
+//    case ORDER_RESERVATION = 'order_reservation';
+//    case PAYMENT_DELIVERY = 'payment_delivery';
 }
