@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\ProductReservation;
+use App\Repository\ProductReservationRepository;
 use App\Service\ReservationService;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,12 +30,20 @@ final class ProductReservationController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/product/reservation', name: 'app_product_reserve_add', methods: ['POST'])]
+    #[Route('/product/reservation/add', name: 'app_product_reserve_add', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
         $data = $request->toArray();
         $result = $this->reservationService->reserve($data);
 
         return new JsonResponse(['message' => $result]);
+    }
+
+
+    #[Route('/product/reservation/{id}', name: 'app_product_reservation_delete', methods: ['DELETE'])]
+    public function delete(ProductReservation $productReservation, ProductReservationRepository $repository): JsonResponse
+    {
+        $repository->remove($productReservation);
+        return new JsonResponse(['message' => 'Reservation deleted successfully'], Response::HTTP_NO_CONTENT);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use App\Controller\ProductReservationController;
 use App\DTO\ReserveInput;
@@ -17,8 +18,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         input: ReserveInput::class,
         name: 'app_product_reserve'
     ),
+    new Delete(uriTemplate: '/product/reservation/{id}',
+        routeName: 'app_product_reservation_delete',
+        requirements: ['id' => '\d+'],
+        controller: ProductReservationController::class,
+        name: 'app_product_reservation_delete'
+    )
 ])]
-#[ApiResource]
+
 #[ORM\Entity]
 class ProductReservation
 {
