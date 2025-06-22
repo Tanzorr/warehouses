@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(operations: [
     new Post(routeName: 'app_product_reserve_add',
         controller: ProductReservationController::class,
-        input: ReserveInput::class,
+        input: ReserveInput::class, # good job, but the input DTO should allow you multimple PRODUCTS per one reservations, so you can make it an atomic operation. (just imagine the amount of requests you have to perform for a big order - risk of failure increases with each request)
         name: 'app_product_reserve'
     ),
     new Delete(uriTemplate: '/product/reservation/{id}',

@@ -6,7 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CategroyRepository;
 use Doctrine\ORM\Mapping as ORM;
 #[ApiResource]
-#[ORM\Entity(repositoryClass: CategroyRepository::class)]
+#[ORM\Entity(repositoryClass: CategroyRepository::class)] # FIXME:  rename the repository
 class Category
 {
     #[ORM\Id]
@@ -14,13 +14,13 @@ class Category
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255)] # FIXME: add validation rules that checks string length (min and max)
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true)] # FIXME: this on should be a nullable OneToOne with self
     private ?int $parentCategory = null;
 
     public function getId(): ?int
