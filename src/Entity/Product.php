@@ -40,11 +40,10 @@ class Product
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    // ⚠️ Рекомендую замінити на relation до Warehouse
-    #[ORM\Column]
-    private ?int $warehouseId = null;
+    #[ORM\ManyToOne(targetEntity: Warehouse::class, inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Warehouse $warehouse = null;
 
-    // ──────── Відношення ────────
     #[ORM\OneToMany(
         targetEntity: StockAvailability::class,
         mappedBy: 'product',
@@ -53,13 +52,11 @@ class Product
     )]
     private Collection $stockAvailabilities;
 
-    // ──────── Конструктор ────────
     public function __construct()
     {
         $this->stockAvailabilities = new ArrayCollection();
     }
 
-    // ──────── Геттери та сеттери ────────
 
     public function getId(): ?int
     {
@@ -143,18 +140,7 @@ class Product
         return $this;
     }
 
-    public function getWarehouseId(): ?int
-    {
-        return $this->warehouseId;
-    }
 
-    public function setWarehouseId(int $warehouseId): static
-    {
-        $this->warehouseId = $warehouseId;
-        return $this;
-    }
-
-    // ──────── StockAvailabilities ────────
 
     public function getStockAvailabilities(): Collection
     {
@@ -165,7 +151,6 @@ class Product
     {
         if (!$this->stockAvailabilities->contains($stockAvailability)) {
             $this->stockAvailabilities->add($stockAvailability);
-            $stockAvailability->setProduct($this);
         }
 
         return $this;
@@ -173,10 +158,8 @@ class Product
 
     public function removeStockAvailability(StockAvailability $stockAvailability): static
     {
-        if ($this->stockAvailabilities->removeElement($stockAvailability)) {
-            if ($stockAvailability->getProduct() === $this) {
-                $stockAvailability->setProduct(null);
-            }
+        if ($this->stockAvailabilities->contains($stockAvailability)) {
+            $this->stockAvailabilities->removeElement($stockAvailability);
         }
 
         return $this;

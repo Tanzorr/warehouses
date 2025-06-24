@@ -2,11 +2,16 @@
 
 namespace App\DTO;
 
+use App\Entity\Product;
 
 class ReserveInput
 {
-    public int $product_id = 0;
-    public int $warehouse_id = 0;
-    public int $quantity = 0;
+    /**
+     * @var Product[]
+     */
+    public array $products = [];
+
+    public int $warehouseId = 0;
+
     public string $comment = '';
 }

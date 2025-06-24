@@ -24,17 +24,14 @@ class ReservationService
     public function reserve(array $data): string
     {
         try {
-            $productId = $data['product_id'] ?? null;
+            $products = $data['products'] ?? null;
             $quantity = $data['quantity'] ?? 0;
             $comment = $data['comment'] ?? null;
 
-            $product = $this->productRepository->getOrFailById($productId);
-            $warehouseId = $this->warehouseRepository->getOrFailByTitle($data['warehouse_title'])->getId();
+            $product = $this->productRepository->getOrFailById($products);
 
-            $this->assertSufficientStock($product, $quantity);
-            $this->assertSufficientAvailableAfterReservations($product, $quantity);
 
-            $productReservation = $this->reservationRepository->create($product, $warehouseId, $quantity, $comment);
+            $productReservation = $this->reservationRepository->create($product,  $quantity, $comment);
             $this->reservationRepository->save($productReservation);
 
             return 'Reservation successful.';
@@ -44,27 +41,4 @@ class ReservationService
     }
 
 
-    private function assertSufficientStock(Product $product, int $quantity): void
-    {
-        if ($product->getStockQuantity() < $quantity) {
-            throw new \Exception('Not enough stock available for reservation.');
-        }
-    }
-
-    private function getReservedQuantity(Product $product): float
-    {
-        $reservations = $this->reservationRepository->findByProductId($product->getId());
-        return array_sum(array_map(
-            fn(ProductReservation $reservation) => $reservation->getQuantity(),
-            $reservations
-        ));
-    }
-
-    private function assertSufficientAvailableAfterReservations(Product $product, int $quantity): void
-    {
-        $available = $product->getStockQuantity() - $this->getReservedQuantity($product);
-        if ($available < $quantity) {
-            throw new \Exception('Not enough stock available after considering existing reservations.');
-        }
-    }
 }
