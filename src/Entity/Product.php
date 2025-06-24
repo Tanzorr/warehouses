@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,33 +24,42 @@ class Product
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $price = null;
-
-    #[ORM\Column]
-    private ?int $stockQuantity = null;
 
     #[ORM\Column(length: 255)]
     private ?string $SKU = null;
 
-    #[ORM\Column(length: 255)]
-    private ?int $CategoryId = null;
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
+    // ⚠️ Рекомендую замінити на relation до Warehouse
     #[ORM\Column]
-    private ?int $wearhouse_id = null;
+    private ?int $warehouseId = null;
 
+    // ──────── Відношення ────────
+    #[ORM\OneToMany(
+        targetEntity: StockAvailability::class,
+        mappedBy: 'product',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $stockAvailabilities;
 
-
+    // ──────── Конструктор ────────
     public function __construct()
     {
-
+        $this->stockAvailabilities = new ArrayCollection();
     }
+
+    // ──────── Геттери та сеттери ────────
 
     public function getId(): ?int
     {
@@ -63,7 +74,6 @@ class Product
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -75,7 +85,6 @@ class Product
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -87,19 +96,6 @@ class Product
     public function setPrice(string $price): static
     {
         $this->price = $price;
-
-        return $this;
-    }
-
-    public function getStockQuantity(): ?int
-    {
-        return $this->stockQuantity;
-    }
-
-    public function setStockQuantity(int $stockQuantity): static
-    {
-        $this->stockQuantity = $stockQuantity;
-
         return $this;
     }
 
@@ -111,55 +107,87 @@ class Product
     public function setSKU(string $SKU): static
     {
         $this->SKU = $SKU;
-
         return $this;
     }
 
-    public function getCategoryId(): ?int
+    public function getCategory(): ?Category
     {
-        return $this->CategoryId;
+        return $this->category;
     }
 
-    public function setCategoryId(int $CategoryId): static
+    public function setCategory(Category $category): static
     {
-        $this->CategoryId = $CategoryId;
-
+        $this->category = $category;
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
-
+        $this->createdAt = $createdAt;
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getWarehouseId(): ?int
+    {
+        return $this->warehouseId;
+    }
+
+    public function setWarehouseId(int $warehouseId): static
+    {
+        $this->warehouseId = $warehouseId;
+        return $this;
+    }
+
+    // ──────── StockAvailabilities ────────
+
+    public function getStockAvailabilities(): Collection
+    {
+        return $this->stockAvailabilities;
+    }
+
+    public function addStockAvailability(StockAvailability $stockAvailability): static
+    {
+        if (!$this->stockAvailabilities->contains($stockAvailability)) {
+            $this->stockAvailabilities->add($stockAvailability);
+            $stockAvailability->setProduct($this);
+        }
 
         return $this;
     }
 
-    public function getWearhouseId(): ?int
+    public function removeStockAvailability(StockAvailability $stockAvailability): static
     {
-        return $this->wearhouse_id;
-    }
-
-    public function setWearhouseId(int $wearhouse_id): static
-    {
-        $this->wearhouse_id = $wearhouse_id;
+        if ($this->stockAvailabilities->removeElement($stockAvailability)) {
+            if ($stockAvailability->getProduct() === $this) {
+                $stockAvailability->setProduct(null);
+            }
+        }
 
         return $this;
+    }
+
+    public function getTotalStockQuantity(): int
+    {
+        return array_reduce(
+            $this->stockAvailabilities->toArray(),
+            fn($carry, StockAvailability $item) => $carry + $item->getAmount(),
+            0
+        );
     }
 }

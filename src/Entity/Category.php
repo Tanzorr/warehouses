@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Repository\CategroyRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource]
-#[ORM\Entity(repositoryClass: CategroyRepository::class)]
+#[ORM\Entity(repositoryClass: CategoryRepository::class)]
+
 class Category
 {
     #[ORM\Id]
@@ -15,13 +17,19 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'The name must be at least {{ limit }} characters long',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters'
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $parentCategory = null;
+    #[ORM\OneToOne(targetEntity: self::class, mappedBy: 'parentCategory')]
+    private ?self $parentCategory = null;
 
     public function getId(): ?int
     {

@@ -30,9 +30,9 @@ class ProductFixture extends Fixture implements DependentFixtureInterface
             $product->setUpdatedAt(new \DateTimeImmutable());
 
             $randomCategory = $categories[array_rand($categories)];
-            $product->setCategoryId($randomCategory->getId());
+            $product->setCategory($randomCategory->getId());
             $randomWarehouse = $warehouses[array_rand($warehouses)];
-            $product->setWearhouseId($randomWarehouse->getId());
+            $product->setWarehouseId($randomWarehouse->getId());
 
             $manager->persist($product);
         }
