@@ -26,18 +26,17 @@ class ReservationService
         try {
             $productId = $data['product_id'] ?? null;
             $quantity = $data['quantity'] ?? 0;
+            $comment = $data['comment'] ?? null;
+
             $product = $this->productRepository->getOrFailById($productId);
-            $warehouse = $this->warehouseRepository->getOrFailByTitle($data['warehouse_title']);
+            $warehouseId = $this->warehouseRepository->getOrFailByTitle($data['warehouse_title'])->getId();
+
             $this->assertSufficientStock($product, $quantity);
             $this->assertSufficientAvailableAfterReservations($product, $quantity);
 
-            $productReservation = $this->reservationRepository->create(
-                $product,
-                $warehouse->getId(),
-                $data['quantity'],
-                $data['comment'] ?? null
-            );
+            $productReservation = $this->reservationRepository->create($product, $warehouseId, $quantity, $comment);
             $this->reservationRepository->save($productReservation);
+
             return 'Reservation successful.';
         } catch (\Exception $e) {
             return 'Error: ' . $e->getMessage();

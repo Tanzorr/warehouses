@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Product;
 use App\Entity\ProductReservation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
