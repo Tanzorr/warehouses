@@ -91,6 +91,8 @@ class Product
         return $this;
     }
 
+    // FIXME: StockAvailability should be an entity that contains product reference, warehouse reference and an amount
+    // like this: {product_id:1 , warehouse_id: 2, amount 100}. Such approach gives you possibility to have multiple amounts per each warehouse
     public function getStockQuantity(): ?int
     {
         return $this->stockQuantity;
@@ -151,6 +153,8 @@ class Product
         return $this;
     }
 
+    // FIXME: Symfony doesn't operate with ID fields excpet $entity->id, only relations
+    // @see https://www.doctrine-project.org/projects/doctrine-orm/en/3.4/reference/association-mapping.html``
     public function getWearhouseId(): ?int
     {
         return $this->wearhouse_id;
