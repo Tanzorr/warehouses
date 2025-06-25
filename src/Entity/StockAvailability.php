@@ -13,11 +13,14 @@ class StockAvailability
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $product_id = null;
+    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'stockAvailabilities')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Product $product = null;
 
-    #[ORM\Column]
-    private ?int $warehouse_id = null;
+
+    #[ORM\ManyToOne(targetEntity: Warehouse::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Warehouse $warehouse = null;
 
     #[ORM\Column]
     private ?int $amount = null;
@@ -27,27 +30,25 @@ class StockAvailability
         return $this->id;
     }
 
-    public function getProductId(): ?int
+    public function getProduct(): ?Product
     {
-        return $this->product_id;
+        return $this->product;
     }
 
-    public function setProductId(int $product_id): static
+    public function setProduct(?Product $product): static
     {
-        $this->product_id = $product_id;
-
+        $this->product = $product;
         return $this;
     }
 
-    public function getWarehouseId(): ?int
+    public function getWarehouse(): ?Warehouse
     {
-        return $this->warehouse_id;
+        return $this->warehouse;
     }
 
-    public function setWarehouseId(int $warehouse_id): static
+    public function setWarehouse(?Warehouse $warehouse): static
     {
-        $this->warehouse_id = $warehouse_id;
-
+        $this->warehouse = $warehouse;
         return $this;
     }
 
@@ -59,15 +60,6 @@ class StockAvailability
     public function setAmount(int $amount): static
     {
         $this->amount = $amount;
-
         return $this;
-    }
-
-    public function setProduct(Product $param)
-    {
-    }
-
-    public function getProduct()
-    {
     }
 }

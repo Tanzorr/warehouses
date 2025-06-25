@@ -1,5 +1,4 @@
 <?php
-
 namespace App\DTO;
 
 use App\Entity\Product;
@@ -7,11 +6,19 @@ use App\Entity\Product;
 class ReserveInput
 {
     /**
-     * @var Product[]
+     * @var ReserveProductInput[]
      */
-    public array $products = [];
+    public array $products;
 
     public int $warehouseId = 0;
 
     public string $comment = '';
+
+    public function __construct()
+    {
+        $this->products = [
+            new ReserveProductInput(1, 5),
+            new ReserveProductInput(2, 3),
+        ];
+    }
 }

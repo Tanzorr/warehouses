@@ -3159,9 +3159,6 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "sKU": {
-                        "type": "string"
-                    },
                     "category": {
                         "type": "string"
                     },

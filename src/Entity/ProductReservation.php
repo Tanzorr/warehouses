@@ -8,15 +8,14 @@ use ApiPlatform\Metadata\Post;
 use App\Controller\ProductReservationController;
 use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-#[ApiResource(operations: [
+#[ApiResource(
+    operations: [
     new Post(routeName: 'app_product_reserve_add',
         controller: ProductReservationController::class,
-        input: ReserveInput::class,
-        name: 'app_product_reserve'
+        input: ReserveInput::class
     ),
     new Delete(uriTemplate: '/product/reservation/{id}',
         routeName: 'app_product_reservation_delete',
@@ -50,10 +49,10 @@ class ProductReservation
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $released_at = null;
 
-    #[ORM\Column]
+    #[ORM\ManyToOne(targetEntity: Warehouse::class)]
     #[Assert\Type('integer')]
     #[Assert\NotBlank]
-    private ?int $warehouse_id = null;
+    private ?int $warehouseId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
@@ -109,12 +108,12 @@ class ProductReservation
 
     public function getWarehouseId(): ?int
     {
-        return $this->warehouse_id;
+        return $this->warehouseId;
     }
 
-    public function setWarehouseId(int $warehouse_id): self
+    public function setWarehouseId(int $warehouseId): self
     {
-        $this->warehouse_id = $warehouse_id;
+        $this->warehouseId = $warehouseId;
         return $this;
     }
     public function getComment(): ?string

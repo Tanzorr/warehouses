@@ -6,9 +6,9 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+
 #[ApiResource]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-
 class Category
 {
     #[ORM\Id]
@@ -28,7 +28,8 @@ class Category
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, mappedBy: 'parentCategory')]
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?self $parentCategory = null;
 
     public function getId(): ?int
@@ -60,12 +61,12 @@ class Category
         return $this;
     }
 
-    public function getParentCategory(): ?int
+    public function getParentCategory(): ?self
     {
         return $this->parentCategory;
     }
 
-    public function setParentCategory(?int $parentCategory): static
+    public function setParentCategory(?self $parentCategory): static
     {
         $this->parentCategory = $parentCategory;
 

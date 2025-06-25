@@ -12,8 +12,7 @@ class ReservationService
 {
     public function __construct(
         private readonly ProductReservationRepository $reservationRepository,
-        private readonly ProductRepository            $productRepository,
-        private readonly WarehouseRepository     $warehouseRepository,
+        private readonly ProductRepository            $productRepository
     )
     {
     }
@@ -22,23 +21,24 @@ class ReservationService
      * @throws \Exception
      */
     public function reserve(array $data): string
-    {
-        try {
-            $products = $data['products'] ?? null;
-            $quantity = $data['quantity'] ?? 0;
-            $comment = $data['comment'] ?? null;
+   {
+       var_dump($data);
 
-            $product = $this->productRepository->getOrFailById($products);
-
-
-            $productReservation = $this->reservationRepository->create($product,  $quantity, $comment);
-            $this->reservationRepository->save($productReservation);
-
-            return 'Reservation successful.';
-        } catch (\Exception $e) {
-            return 'Error: ' . $e->getMessage();
-        }
+       return 'Reservation functionality is not implemented yet.';
+//        try {
+//            $products = $data['products'] ?? null;
+//            $quantity = $data['quantity'] ?? 0;
+//            $comment = $data['comment'] ?? null;
+//
+//            $product = $this->productRepository->getOrFailById($products);
+//
+//
+//            $productReservation = $this->reservationRepository->create($product,  $quantity, $comment);
+//            $this->reservationRepository->save($productReservation);
+//
+//            return 'Reservation successful.';
+//        } catch (\Exception $e) {
+//            return 'Error: ' . $e->getMessage();
+//        }
     }
-
-
 }

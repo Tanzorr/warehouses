@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250615190414 extends AbstractMigration
+final class Version20250625100218 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,13 +21,13 @@ final class Version20250615190414 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE inventory_transaction DROP FOREIGN KEY FK_6C5391E4584665A
+            ALTER TABLE category ADD parent_category_id INT DEFAULT NULL
         SQL);
         $this->addSql(<<<'SQL'
-            DROP INDEX IDX_6C5391E4584665A ON inventory_transaction
+            ALTER TABLE category ADD CONSTRAINT FK_64C19C1796A8F92 FOREIGN KEY (parent_category_id) REFERENCES category (id)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE inventory_transaction ADD reservation_id INT NOT NULL, DROP product_id, DROP quantity, DROP source_type, DROP source_id
+            CREATE INDEX IDX_64C19C1796A8F92 ON category (parent_category_id)
         SQL);
     }
 
@@ -35,13 +35,13 @@ final class Version20250615190414 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE inventory_transaction ADD quantity INT NOT NULL, ADD source_type VARCHAR(50) NOT NULL, ADD source_id INT NOT NULL, CHANGE reservation_id product_id INT NOT NULL
+            ALTER TABLE category DROP FOREIGN KEY FK_64C19C1796A8F92
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE inventory_transaction ADD CONSTRAINT FK_6C5391E4584665A FOREIGN KEY (product_id) REFERENCES product (id)
+            DROP INDEX IDX_64C19C1796A8F92 ON category
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE INDEX IDX_6C5391E4584665A ON inventory_transaction (product_id)
+            ALTER TABLE category DROP parent_category_id
         SQL);
     }
 }

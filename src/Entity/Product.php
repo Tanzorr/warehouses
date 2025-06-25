@@ -40,23 +40,15 @@ class Product
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(targetEntity: Warehouse::class, inversedBy: 'products')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Warehouse $warehouse = null;
-
-    #[ORM\OneToMany(
-        targetEntity: StockAvailability::class,
-        mappedBy: 'product',
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
-    )]
+    #[ORM\OneToMany(targetEntity: StockAvailability::class, mappedBy: 'product', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $stockAvailabilities;
+
+
 
     public function __construct()
     {
         $this->stockAvailabilities = new ArrayCollection();
     }
-
 
     public function getId(): ?int
     {
@@ -138,39 +130,5 @@ class Product
     {
         $this->updatedAt = $updatedAt;
         return $this;
-    }
-
-
-
-    public function getStockAvailabilities(): Collection
-    {
-        return $this->stockAvailabilities;
-    }
-
-    public function addStockAvailability(StockAvailability $stockAvailability): static
-    {
-        if (!$this->stockAvailabilities->contains($stockAvailability)) {
-            $this->stockAvailabilities->add($stockAvailability);
-        }
-
-        return $this;
-    }
-
-    public function removeStockAvailability(StockAvailability $stockAvailability): static
-    {
-        if ($this->stockAvailabilities->contains($stockAvailability)) {
-            $this->stockAvailabilities->removeElement($stockAvailability);
-        }
-
-        return $this;
-    }
-
-    public function getTotalStockQuantity(): int
-    {
-        return array_reduce(
-            $this->stockAvailabilities->toArray(),
-            fn($carry, StockAvailability $item) => $carry + $item->getAmount(),
-            0
-        );
     }
 }
