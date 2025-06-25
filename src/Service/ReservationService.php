@@ -22,7 +22,8 @@ class ReservationService
      */
     public function reserve(array $data): string
    {
-       var_dump($data);
+       $products = $this->productRepository->findAll();
+       dd($products);
 
        return 'Reservation functionality is not implemented yet.';
 //        try {
