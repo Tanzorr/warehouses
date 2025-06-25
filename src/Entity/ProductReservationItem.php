@@ -14,9 +14,9 @@ class ProductReservationItem
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: ProductReservation::class, inversedBy: "reservationItems")]
-    private int $productReservationId;
+    private ProductReservation $productReservation;
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "reservationItems")]
-    private ?int $productId = null;
+    private ?Product $product = null;
 
     #[ORM\Column]
     private ?int $amount = null;
@@ -26,14 +26,14 @@ class ProductReservationItem
         return $this->id;
     }
 
-    public function getProductId(): ?int
+    public function getProduct(): ?Product
     {
-        return $this->productId;
+        return $this->product;
     }
 
-    public function setProductId(int $productId): static
+    public function setProduct(Product $product): static
     {
-        $this->productId = $productId;
+        $this->product = $product;
 
         return $this;
     }
@@ -49,4 +49,17 @@ class ProductReservationItem
 
         return $this;
     }
+
+    public  function getProductReservation(): ProductReservation
+    {
+        return $this->productReservation;
+    }
+
+    public function setProductReservation(ProductReservation $productReservation): static
+    {
+        $this->productReservation = $productReservation;
+
+        return $this;
+    }
+
 }

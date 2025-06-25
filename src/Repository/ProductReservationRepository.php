@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Entity\ProductReservation;
+use App\Entity\Warehouse;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,11 +18,10 @@ class ProductReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, ProductReservation::class);
     }
 
-    public function create(Product $product, int $quantity,  ?string $comment): ProductReservation
+    public function create(Warehouse $warehouse,  ?string $comment): ProductReservation
     {
         return  (new ProductReservation())
-            ->setProductId($product->getId())
-            ->setQuantity($quantity)
+            ->setWarehouse($warehouse)
             ->setReservedAt(new \DateTimeImmutable())
             ->setComment($comment);
     }

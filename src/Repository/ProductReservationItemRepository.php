@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Product;
+use App\Entity\ProductReservation;
 use App\Entity\ProductReservationItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,6 +16,20 @@ class ProductReservationItemRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ProductReservationItem::class);
+    }
+
+    public function create(Product $product, ProductReservation $productReservation, int $amount): ProductReservationItem
+    {
+        return (new ProductReservationItem())
+            ->setProductReservation($productReservation)
+            ->setProduct($product)
+            ->setAmount($amount);
+    }
+
+    public function save(ProductReservationItem $item): void
+    {
+        $this->getEntityManager()->persist($item);
+        $this->getEntityManager()->flush();
     }
 
     //    /**

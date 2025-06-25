@@ -4,12 +4,12 @@ namespace App\DTO;
 
 class ReserveProductInput
 {
-    public int $productId;
+    public int $id;
     public int $amount;
 
-    public function __construct(int $productId, int $amount)
+    public function __construct(int $id, int $amount)
     {
-        $this->productId = $productId;
+        $this->id = $id;
         $this->amount = $amount;
     }
 }

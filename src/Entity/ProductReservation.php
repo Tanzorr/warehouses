@@ -8,7 +8,6 @@ use ApiPlatform\Metadata\Post;
 use App\Controller\ProductReservationController;
 use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ApiResource(
@@ -34,25 +33,13 @@ class ProductReservation
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank]
-    #[Assert\Type('integer')]
-    private ?int $product_id = null;
-
-    #[ORM\Column]
-    #[Assert\NotBlank]
-    #[Assert\Type('integer')]
-    private ?int $quantity = null;
-
-    #[ORM\Column]
     private ?\DateTimeImmutable $reserved_at = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $released_at = null;
 
     #[ORM\ManyToOne(targetEntity: Warehouse::class)]
-    #[Assert\Type('integer')]
-    #[Assert\NotBlank]
-    private ?int $warehouseId = null;
+    private ?Warehouse $warehouse = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
@@ -62,27 +49,6 @@ class ProductReservation
         return $this->id;
     }
 
-    public function getProductId(): ?int
-    {
-        return $this->product_id;
-    }
-
-    public function setProductId(int $product_id): self
-    {
-        $this->product_id = $product_id;
-        return $this;
-    }
-
-    public function getQuantity(): ?int
-    {
-        return $this->quantity;
-    }
-
-    public function setQuantity(int $quantity): self
-    {
-        $this->quantity = $quantity;
-        return $this;
-    }
 
     public function getReservedAt(): ?\DateTimeImmutable
     {
@@ -106,14 +72,14 @@ class ProductReservation
         return $this;
     }
 
-    public function getWarehouseId(): ?int
+    public function getWarehouse(): ?Warehouse
     {
-        return $this->warehouseId;
+        return $this->warehouse;
     }
 
-    public function setWarehouseId(int $warehouseId): self
+    public function setWarehouse(Warehouse $warehouse): self
     {
-        $this->warehouseId = $warehouseId;
+        $this->warehouse = $warehouse;
         return $this;
     }
     public function getComment(): ?string

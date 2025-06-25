@@ -5,8 +5,6 @@ namespace App\DataFixtures;
 use App\Entity\Product;
 use App\Entity\StockAvailability;
 use App\Entity\Warehouse;
-use App\Repository\ProductRepository;
-use App\Repository\ProductReservationRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -20,12 +18,8 @@ class StockAvailabilityFixture extends Fixture implements DependentFixtureInterf
     {
         $faker = Factory::create();
 
-     //   $manager->clear();
-
-
         $warehouses = $manager->getRepository(Warehouse::class)->findAll();
         $products = $manager->getRepository(Product::class)->findAll();
-
 
         if (empty($products) || empty($warehouses)) {
             return;
