@@ -39,6 +39,7 @@ class ProductReservation
     private ?\DateTimeImmutable $released_at = null;
 
     #[ORM\ManyToOne(targetEntity: Warehouse::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Warehouse $warehouse = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -91,5 +92,10 @@ class ProductReservation
     {
         $this->comment = $comment;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getComment() ?? 'Reservation ' . $this->getId() . ' at ' . $this->getReservedAt()->format('Y-m-d H:i:s');
     }
 }

@@ -28,7 +28,7 @@ class Product
     private ?string $price = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $SKU = null;
+    private ?string $sku = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
@@ -71,7 +71,7 @@ class Product
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
         return $this;
@@ -88,14 +88,14 @@ class Product
         return $this;
     }
 
-    public function getSKU(): ?string
+    public function getSku(): ?string
     {
-        return $this->SKU;
+        return $this->sku;
     }
 
-    public function setSKU(string $SKU): static
+    public function setSku(string $sku): static
     {
-        $this->SKU = $SKU;
+        $this->sku = $sku;
         return $this;
     }
 
@@ -130,5 +130,10 @@ class Product
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }
