@@ -13,35 +13,32 @@ use App\Entity\Warehouse;
 readonly class ReservationService
 {
     public function __construct(
-        private ProductReservationRepository     $reservationRepository,
-        private ProductReservationItemRepository $productReservationItemRepository,
-        private WarehouseRepository              $warehouseRepository,
-        private ProductRepository                $productRepository,
-        private StockAvailabilityService         $stockAvailabilityService,
-    )
-    {
-    }
+        private ProductReservationRepository $reservationRepository,
+        private ProductReservationItemRepository $itemRepository,
+        private WarehouseRepository $warehouseRepository,
+        private ProductRepository $productRepository,
+        private StockAvailabilityService $stockService
+    ) {}
 
     /**
-     * @return string Reservation ID
      * @throws \Exception
      */
-    public function reserve($data): string
+    public function reserve(array $data): string
     {
-        $warehouse = $this->findWarehouseOrFail($data['warehouseId']);
-        $productReservation = $this->createAndSaveReservation($warehouse, $data['comment'] ?? null);
+        $warehouse = $this->getWarehouse($data['warehouseId']);
+        $reservation = $this->createReservation($warehouse, $data['comment'] ?? null);
 
-        foreach ($data['products'] as $productItem) {
-            $product = $this->findProductOrFail($productItem['id']);
-            $this->createAndSaveReservationItem($product, $productReservation, $productItem['amount']);
+        foreach ($data['products'] as $item) {
+            $product = $this->getProduct($item['id']);
+            $this->addReservationItem($product, $reservation, $item['amount']);
         }
 
-        return (string)$productReservation->getId();
+        return (string) $reservation->getId();
     }
 
-    private function findWarehouseOrFail(int $warehouseId): Warehouse
+    private function getWarehouse(int $id): Warehouse
     {
-        $warehouse = $this->warehouseRepository->find($warehouseId);
+        $warehouse = $this->warehouseRepository->find($id);
         if (!$warehouse) {
             throw new \InvalidArgumentException('Warehouse not found');
         }
@@ -51,35 +48,36 @@ readonly class ReservationService
     /**
      * @throws \Exception
      */
-    private function findProductOrFail(int $productId): Product
+    private function getProduct(int $id): Product
     {
-        $product = $this->productRepository->getOrFailById($productId);
+        $product = $this->productRepository->getOrFailById($id);
         if (!$product) {
-            throw new \InvalidArgumentException(sprintf('Product with ID %d not found', $productId));
+            throw new \InvalidArgumentException("Product with ID $id not found");
         }
         return $product;
     }
 
-    private function createAndSaveReservation(Warehouse $warehouse, ?string $comment): ProductReservation
+    private function createReservation(Warehouse $warehouse, ?string $comment): ProductReservation
     {
         $reservation = $this->reservationRepository->create($warehouse, $comment);
         $this->reservationRepository->save($reservation);
         return $reservation;
     }
 
-    private function createAndSaveReservationItem(Product $product, ProductReservation $reservation, int $amount): void
+    private function addReservationItem(Product $product, ProductReservation $reservation, int $amount): void
     {
         if ($amount <= 0) {
             throw new \InvalidArgumentException('Amount must be positive');
         }
 
-        if(!$this->stockAvailabilityService->checkAccessedProductsInWarehouse($product->getId(), $reservation->getWarehouse()->getId(), $amount)) {
-            throw new \InvalidArgumentException(sprintf('Not enough stock for product ID %d in warehouse ID %d', $product->getId(), $reservation->getWarehouse()->getId()));
+        $warehouseId = $reservation->getWarehouse()->getId();
+        if (!$this->stockService->checkAccessedProductsInWarehouse($product->getId(), $warehouseId, $amount)) {
+            throw new \InvalidArgumentException("Not enough stock for product ID {$product->getId()} in warehouse ID $warehouseId");
         }
 
-        $this->stockAvailabilityService->recalculateStock($product->getId(), $reservation->getWarehouse()->getId(), $amount);
+        $this->stockService->recalculateStock($product->getId(), $warehouseId, $amount);
 
-        $item = $this->productReservationItemRepository->create($product, $reservation, $amount);
-        $this->productReservationItemRepository->save($item);
+        $item = $this->itemRepository->create($product, $reservation, $amount);
+        $this->itemRepository->save($item);
     }
 }
