@@ -17,7 +17,7 @@ class CategoryRepository extends ServiceEntityRepository
     }
 
     //    /**
-    //     * @return Categroy[] Returns an array of Categroy objects
+    //     * @return Category[] Returns an array of Category objects
     //     */
     //    public function findByExampleField($value): array
     //    {

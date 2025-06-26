@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class WerehouseController extends AbstractController
+final class WarehouseController extends AbstractController
 {
     #[Route('/warehouse', name: 'app_warehouse')]
     public function index(): JsonResponse

@@ -50,11 +50,7 @@ readonly class ReservationService
      */
     private function getProduct(int $id): Product
     {
-        $product = $this->productRepository->getOrFailById($id);
-        if (!$product) {
-            throw new \InvalidArgumentException("Product with ID $id not found");
-        }
-        return $product;
+        return $this->productRepository->getOrFailById($id);
     }
 
     private function createReservation(Warehouse $warehouse, ?string $comment): ProductReservation

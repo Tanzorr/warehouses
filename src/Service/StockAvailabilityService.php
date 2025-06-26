@@ -11,6 +11,11 @@ class StockAvailabilityService
     public function checkAccessedProductsInWarehouse(int $productId, int $warehouseId, int $amount): bool
     {
         $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
+
+        if (!$stock) {
+            throw new \InvalidArgumentException('No stock information available for the product in the warehouse');
+        }
+
         return $stock->getAmount() >= $amount;
     }
 
@@ -19,12 +24,12 @@ class StockAvailabilityService
         $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
 
         if (!$stock) {
-            throw new \InvalidArgumentException('Stock availability not found for product in warehouse');
+            throw new \InvalidArgumentException('No stock information available for the product in the warehouse');
         }
 
         $newAmount = $stock->getAmount() - $amount;
         if ($newAmount < 0) {
-            throw new \InvalidArgumentException('Insufficient stock for product in warehouse');
+            throw new \InvalidArgumentException('Insufficient stock for the product in the warehouse');
         }
 
         $stock->setAmount($newAmount);
