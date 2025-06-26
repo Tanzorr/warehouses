@@ -16,8 +16,11 @@ readonly class ReservationService
         private ProductReservationRepository     $reservationRepository,
         private ProductReservationItemRepository $productReservationItemRepository,
         private WarehouseRepository              $warehouseRepository,
-        private ProductRepository                $productRepository
-    ) {}
+        private ProductRepository                $productRepository,
+        private StockAvailabilityService         $stockAvailabilityService,
+    )
+    {
+    }
 
     /**
      * @return string Reservation ID
@@ -33,7 +36,7 @@ readonly class ReservationService
             $this->createAndSaveReservationItem($product, $productReservation, $productItem['amount']);
         }
 
-        return (string) $productReservation->getId();
+        return (string)$productReservation->getId();
     }
 
     private function findWarehouseOrFail(int $warehouseId): Warehouse
@@ -69,6 +72,13 @@ readonly class ReservationService
         if ($amount <= 0) {
             throw new \InvalidArgumentException('Amount must be positive');
         }
+
+        if(!$this->stockAvailabilityService->checkAccessedProductsInWarehouse($product->getId(), $reservation->getWarehouse()->getId(), $amount)) {
+            throw new \InvalidArgumentException(sprintf('Not enough stock for product ID %d in warehouse ID %d', $product->getId(), $reservation->getWarehouse()->getId()));
+        }
+
+        $this->stockAvailabilityService->recalculateStock($product->getId(), $reservation->getWarehouse()->getId(), $amount);
+
         $item = $this->productReservationItemRepository->create($product, $reservation, $amount);
         $this->productReservationItemRepository->save($item);
     }
