@@ -16,11 +16,11 @@ class WarehouseRepository extends ServiceEntityRepository
         parent::__construct($registry, Warehouse::class);
     }
 
-    public function getOrFailById(int $warehauseId): Warehouse|null
+    public function getOrFailById(int $warehouseId): Warehouse|null
     {
         $warehouse = $this->createQueryBuilder('w')
-            ->where('w.Warehouse = :id')
-            ->setParameter('id', $warehauseId)
+            ->where('w.id = :id')
+            ->setParameter('id', $warehouseId)
             ->getQuery()
             ->getOneOrNullResult();
 
