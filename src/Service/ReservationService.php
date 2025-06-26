@@ -6,68 +6,70 @@ use App\Repository\ProductRepository;
 use App\Repository\ProductReservationItemRepository;
 use App\Repository\ProductReservationRepository;
 use App\Repository\WarehouseRepository;
+use App\Entity\ProductReservation;
+use App\Entity\Product;
+use App\Entity\Warehouse;
 
-class ReservationService
+readonly class ReservationService
 {
     public function __construct(
-        private readonly ProductReservationRepository $reservationRepository,
-        private readonly ProductReservationItemRepository $productReservationItemRepository,
-        private readonly WarehouseRepository $warehouseRepository,
-        private readonly ProductRepository $productRepository,
-    )
-    {
-    }
+        private ProductReservationRepository     $reservationRepository,
+        private ProductReservationItemRepository $productReservationItemRepository,
+        private WarehouseRepository              $warehouseRepository,
+        private ProductRepository                $productRepository
+    ) {}
 
     /**
-     *
-     * @param array $data
-     * @return string ID резервації
-     * @throws \InvalidArgumentException
+     * @return string Reservation ID
+     * @throws \Exception
      */
-    public function reserve(array $data): string
+    public function reserve($data): string
     {
-        $warehouse = $this->warehouseRepository->find($data['warehouseId'] ?? null);
+        $warehouse = $this->findWarehouseOrFail($data['warehouseId']);
+        $productReservation = $this->createAndSaveReservation($warehouse, $data['comment'] ?? null);
+
+        foreach ($data['products'] as $productItem) {
+            $product = $this->findProductOrFail($productItem['id']);
+            $this->createAndSaveReservationItem($product, $productReservation, $productItem['amount']);
+        }
+
+        return (string) $productReservation->getId();
+    }
+
+    private function findWarehouseOrFail(int $warehouseId): Warehouse
+    {
+        $warehouse = $this->warehouseRepository->find($warehouseId);
         if (!$warehouse) {
             throw new \InvalidArgumentException('Warehouse not found');
         }
+        return $warehouse;
+    }
 
-        $productReservation = $this->reservationRepository->create(
-            $warehouse,
-            $data['comment'] ?? null
-        );
-        $this->reservationRepository->save($productReservation);
-
-        $products = $data['products'] ?? [];
-        if (empty($products)) {
-            throw new \InvalidArgumentException('products array is required');
+    /**
+     * @throws \Exception
+     */
+    private function findProductOrFail(int $productId): Product
+    {
+        $product = $this->productRepository->getOrFailById($productId);
+        if (!$product) {
+            throw new \InvalidArgumentException(sprintf('Product with ID %d not found', $productId));
         }
+        return $product;
+    }
 
-        foreach ($products as $product) {
-            $productId = $product['id'] ?? null;
-            $quantity = $product['amount'] ?? 0;
+    private function createAndSaveReservation(Warehouse $warehouse, ?string $comment): ProductReservation
+    {
+        $reservation = $this->reservationRepository->create($warehouse, $comment);
+        $this->reservationRepository->save($reservation);
+        return $reservation;
+    }
 
-            if (!$productId || $quantity <= 0) {
-                dd($product, $productId, $quantity);
-                throw new \InvalidArgumentException('Invalid product data: id and quantity required');
-            }
-
-            $product = $this->productRepository->getOrFailById($productId);
-
-            if (!$product) {
-                throw new \InvalidArgumentException(sprintf('Product with ID %d not found', $productId));
-            }
-
-
-            $reservationItem = $this->productReservationItemRepository->create(
-                $product,
-                $productReservation,
-                $quantity
-            );
-
-
-            $this->productReservationItemRepository->save($reservationItem);
+    private function createAndSaveReservationItem(Product $product, ProductReservation $reservation, int $amount): void
+    {
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Amount must be positive');
         }
-
-        return (string)$productReservation->getId();
+        $item = $this->productReservationItemRepository->create($product, $reservation, $amount);
+        $this->productReservationItemRepository->save($item);
     }
 }
