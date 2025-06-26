@@ -16,7 +16,7 @@ class Warehouse
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Warehouse = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 1000)]
     private ?string $description = null;
@@ -29,14 +29,14 @@ class Warehouse
         return $this->id;
     }
 
-    public function getWarehouse(): ?string
+    public function getName(): ?string
     {
-        return $this->Warehouse;
+        return $this->name;
     }
 
-    public function setWarehouse(string $Warehouse): static
+    public function setName(string $name): static
     {
-        $this->Warehouse = $Warehouse;
+        $this->name = $name;
 
         return $this;
     }
@@ -46,7 +46,7 @@ class Warehouse
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -63,5 +63,9 @@ class Warehouse
         $this->location = $location;
 
         return $this;
+    }
+
+    public function __toString(){
+        return $this->name ?: 'Warehouse'. ' ' . $this->id;
     }
 }

@@ -15,7 +15,7 @@ class WarehouseFixture extends Fixture
 
        for ($i = 0; $i < 10; $i++) {
             $warehouse = clone $warehouse;
-            $warehouse->setWarehouse('Warehouse ' . ($i + 1));
+            $warehouse->setName('Warehouse ' . ($i + 1));
             $warehouse->setDescription('Description for Warehouse ' . ($i + 1));
             $warehouse->setLocation('Location ' . ($i + 1));
             $manager->persist($warehouse);
