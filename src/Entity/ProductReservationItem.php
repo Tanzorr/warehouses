@@ -14,8 +14,10 @@ class ProductReservationItem
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: ProductReservation::class, inversedBy: "reservationItems")]
+    #[ORM\JoinColumn(nullable: false)]
     private ProductReservation $productReservation;
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "reservationItems")]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
 
     #[ORM\Column]
@@ -62,4 +64,13 @@ class ProductReservationItem
         return $this;
     }
 
+
+    public function __toString(): string
+    {
+        return sprintf(
+            '%s (%d)',
+            $this->product ? $this->product->getName() : 'Unknown Product',
+            $this->amount ? $this->amount : 0
+        );
+    }
 }

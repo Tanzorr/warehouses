@@ -18,7 +18,7 @@ class StockAvailability
     private ?Product $product = null;
 
 
-    #[ORM\ManyToOne(targetEntity: Warehouse::class)]
+    #[ORM\ManyToOne(targetEntity: Warehouse::class, inversedBy: 'stockAvailabilities')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Warehouse $warehouse = null;
 
@@ -57,9 +57,19 @@ class StockAvailability
         return $this->amount;
     }
 
-    public function setAmount(int $amount): static
+    public function setAmount(?int $amount): static
     {
         $this->amount = $amount;
         return $this;
+    }
+
+    public function __toString()
+    {
+        return sprintf(
+            'Stock of %s in %s: %d',
+            $this->product ? $this->product->getName() : 'Unknown Product',
+            $this->warehouse ? $this->warehouse->getName() : 'Unknown Warehouse',
+            $this->amount ?: 0
+        );
     }
 }
