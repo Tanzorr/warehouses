@@ -7,7 +7,10 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use App\Controller\ProductReservationController;
 use App\DTO\ReserveInput;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
+use phpDocumentor\Reflection\Types\Collection;
 
 
 #[ApiResource(
@@ -44,6 +47,18 @@ class ProductReservation
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
+
+    #[ORM\OneToMany(
+        targetEntity: ProductReservationItem::class,
+        mappedBy: 'productReservation',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true)]
+    private PersistentCollection $reservationItems;
+
+    public function __construct()
+    {
+        $this->reservationItems = new PersistentCollection();
+    }
 
     public function getId(): ?int
     {
@@ -91,6 +106,31 @@ class ProductReservation
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
+        return $this;
+    }
+
+    public function getItems():Collection
+    {
+        return $this->reservationItems;
+    }
+
+    public function addItem(ProductReservationItem $item): self
+    {
+        if (!$this->reservationItems->contains($item)) {
+            $this->reservationItems[] = $item;
+            $item->setProductReservation($this);
+        }
+        return $this;
+    }
+
+    public function removeItem(ProductReservationItem $item): self
+    {
+        if ($this->reservationItems->removeElement($item)) {
+            // set the owning side to null (unless already changed)
+            if ($item->getProductReservation() === $this) {
+                $item->setProductReservation(null);
+            }
+        }
         return $this;
     }
 

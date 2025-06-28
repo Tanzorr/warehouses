@@ -41,9 +41,9 @@ final class ProductReservationController extends AbstractController
 
 
     #[Route('/product/reservation/{id}', name: 'app_product_reservation_delete', methods: ['DELETE'])]
-    public function delete(ProductReservation $productReservation, ProductReservationRepository $repository): JsonResponse
+    public function delete(ProductReservation $productReservation): JsonResponse
     {
-        $repository->remove($productReservation);
+        $this->reservationService->canselReservation($productReservation);
         return new JsonResponse(['message' => 'Reservation deleted successfully'], Response::HTTP_NO_CONTENT);
     }
 }

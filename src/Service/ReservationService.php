@@ -71,9 +71,14 @@ readonly class ReservationService
             throw new \InvalidArgumentException("Not enough stock for product ID {$product->getId()} in warehouse ID $warehouseId");
         }
 
-        $this->stockService->recalculateStock($product->getId(), $warehouseId, $amount);
+        $this->stockService->recalculateStockAdd($product->getId(), $warehouseId, $amount);
 
         $item = $this->itemRepository->create($product, $reservation, $amount);
         $this->itemRepository->save($item);
+    }
+
+    public function canselReservation(ProductReservation $reservation): void
+    {
+        $this->reservationRepository->remove($reservation);
     }
 }

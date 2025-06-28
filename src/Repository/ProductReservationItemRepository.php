@@ -31,6 +31,11 @@ class ProductReservationItemRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($item);
         $this->getEntityManager()->flush();
     }
+    public function delete(ProductReservationItem $productReservationItem): void
+    {
+        $this->getEntityManager()->remove($productReservationItem);
+        $this->getEntityManager()->flush();
+    }
 
     //    /**
     //     * @return ProductReservationItem[] Returns an array of ProductReservationItem objects

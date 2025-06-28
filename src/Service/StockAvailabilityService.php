@@ -19,7 +19,7 @@ class StockAvailabilityService
         return $stock->getAmount() >= $amount;
     }
 
-    public function recalculateStock(int $productId, int $warehouseId, int $amount): void
+    public function recalculateStockAdd(int $productId, int $warehouseId, int $amount): void
     {
         $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
 
@@ -28,6 +28,23 @@ class StockAvailabilityService
         }
 
         $newAmount = $stock->getAmount() - $amount;
+        if ($newAmount < 0) {
+            throw new \InvalidArgumentException('Insufficient stock for the product in the warehouse');
+        }
+
+        $stock->setAmount($newAmount);
+        $this->repository->save($stock);
+    }
+
+    public function recalculateStockRemove(int $productId, int $warehouseId, int $amount): void
+    {
+        $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
+
+        if (!$stock) {
+            throw new \InvalidArgumentException('No stock information available for the product in the warehouse');
+        }
+
+        $newAmount = $stock->getAmount() + $amount;
         if ($newAmount < 0) {
             throw new \InvalidArgumentException('Insufficient stock for the product in the warehouse');
         }

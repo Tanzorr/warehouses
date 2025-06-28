@@ -65,6 +65,7 @@ class ProductReservationItem
     }
 
 
+
     public function __toString(): string
     {
         return sprintf(
