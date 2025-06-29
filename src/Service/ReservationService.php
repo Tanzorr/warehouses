@@ -79,6 +79,11 @@ readonly class ReservationService
 
     public function canselReservation(ProductReservation $reservation): void
     {
+        $warehouseId = $reservation->getWarehouse()->getId();
+        foreach ($reservation->getItems() as $item) {
+            $this->stockService->recalculateStockRemove($item->getProduct()->getId(), $warehouseId, $item->getAmount());
+        }
+
         $this->reservationRepository->remove($reservation);
     }
 }
