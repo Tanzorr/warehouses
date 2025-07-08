@@ -4,52 +4,28 @@ namespace App\Service;
 
 use App\Repository\StockAvailabilityRepository;
 
-class StockAvailabilityService
+readonly class StockAvailabilityService
 {
-    public function __construct(private StockAvailabilityRepository $repository) {}
-
-    public function checkAccessedProductsInWarehouse(int $productId, int $warehouseId, int $amount): bool
+    public function __construct(private StockAvailabilityRepository $repository)
     {
-        $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
-
-        if (!$stock) {
-            throw new \InvalidArgumentException('No stock information available for the product in the warehouse');
-        }
-
-        return $stock->getAmount() >= $amount;
     }
 
-    public function recalculateStockAdd(int $productId, int $warehouseId, int $amount): void
+    public function checkAccessedProductsInStock(int $productId, int $amount): bool
     {
-        $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
-
-        if (!$stock) {
-            throw new \InvalidArgumentException('No stock information available for the product in the warehouse');
+        if ($amount <= 0) {
+            return false;
         }
 
-        $newAmount = $stock->getAmount() - $amount;
-        if ($newAmount < 0) {
-            throw new \InvalidArgumentException('Insufficient stock for the product in the warehouse');
-        }
-
-        $stock->setAmount($newAmount);
-        $this->repository->save($stock);
+        $stocks = $this->repository->findOneByProductInStocks($productId);
+        return $this->getStocksAmount($stocks) > $amount;
     }
 
-    public function recalculateStockRemove(int $productId, int $warehouseId, int $amount): void
+    private function getStocksAmount(array $stocks): int
     {
-        $stock = $this->repository->findByProductWarehouse($productId, $warehouseId);
-
-        if (!$stock) {
-            throw new \InvalidArgumentException('No stock information available for the product in the warehouse');
+        $stocksAmount = 0;
+        foreach ($stocks as $stock) {
+            $stocksAmount += $stock->getAmount();
         }
-
-        $newAmount = $stock->getAmount() + $amount;
-        if ($newAmount < 0) {
-            throw new \InvalidArgumentException('Insufficient stock for the product in the warehouse');
-        }
-
-        $stock->setAmount($newAmount);
-        $this->repository->save($stock);
+        return $stocksAmount;
     }
 }

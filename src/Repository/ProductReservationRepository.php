@@ -2,11 +2,11 @@
 
 namespace App\Repository;
 
-use App\Entity\Product;
 use App\Entity\ProductReservation;
 use App\Entity\Warehouse;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @extends ServiceEntityRepository<ProductReservation>
@@ -18,11 +18,12 @@ class ProductReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, ProductReservation::class);
     }
 
-    public function create(Warehouse $warehouse,  ?string $comment): ProductReservation
+    public function create(  ?string $comment,?\DateTimeImmutable $expiredAt): ProductReservation
     {
         return  (new ProductReservation())
-            ->setWarehouse($warehouse)
             ->setReservedAt(new \DateTimeImmutable())
+            ->setExpiredAt($expiredAt)
+            ->setStatus(ProductReservation::STATUS_PENDING)
             ->setComment($comment);
     }
 
@@ -31,6 +32,14 @@ class ProductReservationRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($reservation);
         $this->getEntityManager()->flush();
     }
+
+    public function updateStatus(string $status, ProductReservation $reservation): void
+    {
+        $reservation->setStatus($status);
+        $this->getEntityManager()->persist($reservation);
+        $this->getEntityManager()->flush();
+    }
+
 
     public function remove(ProductReservation $reservation): void
     {

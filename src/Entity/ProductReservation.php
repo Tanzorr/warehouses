@@ -5,62 +5,124 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Controller\ProductReservationController;
+use App\DTO\ReservationStatusInput;
 use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-    new Post(routeName: 'app_product_reserve_add',
-        controller: ProductReservationController::class,
-        input: ReserveInput::class
-    ),
-    new Delete(uriTemplate: '/product/reservation/{id}',
-        routeName: 'app_product_reservation_delete',
-        requirements: ['id' => '\d+'],
-        controller: ProductReservationController::class,
-        name: 'app_product_reservation_delete'
-    )
-])]
-
+        new Post(
+            routeName: 'app_product_reserve_add',
+            controller: ProductReservationController::class,
+            input: ReserveInput::class
+        ),
+        new Put(
+            uriTemplate: '/product/reservation/{id}/staus_update',
+            routeName: 'app_product_reservation_status_update',
+            requirements: ['id' => '\d+'],
+            controller: ProductReservationController::class,
+            input: ReservationStatusInput::class,
+            name: 'app_product_reservation_cancel',
+        ),
+        new Delete(
+            uriTemplate: '/product/reservation/{id}',
+            routeName: 'app_product_reservation_delete',
+            requirements: ['id' => '\d+'],
+            controller: ProductReservationController::class,
+            name: 'app_product_reservation_delete'
+        )
+    ]
+)]
 #[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class ProductReservation
 {
+    public const STATUS_PENDING = 'Pending';
+    public const STATUS_CANCELED = 'Canceled';
+    public const STATUS_EXPIRED = 'Expired';
+    public const STATUS_COMMITTED = 'Committed';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 20)]
+    #[Assert\Choice(
+        choices: [
+            self::STATUS_CANCELED,
+            self::STATUS_EXPIRED,
+            self::STATUS_COMMITTED,
+            self::STATUS_PENDING
+        ],
+        message: 'Status must be one of: active, pending, canceled.'
+    )]
+    public string $status;
+
+
+
     #[ORM\Column]
-    private ?\DateTimeImmutable $reserved_at = null;
+    private \DateTimeImmutable $reserved_at;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $released_at = null;
 
-    #[ORM\ManyToOne(targetEntity: Warehouse::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Warehouse $warehouse = null;
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $expired_at = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?string $comment = null;
+
+    #[ORM\Column]
+    private \DateTimeImmutable $created_at;
+
+    #[ORM\Column]
+    private \DateTimeImmutable $updated_at;
 
     #[ORM\OneToMany(
         targetEntity: ProductReservationItem::class,
         mappedBy: 'productReservation',
         cascade: ['persist', 'remove'],
-        orphanRemoval: true)]
-    private PersistentCollection $reservationItems;
+        orphanRemoval: true
+    )]
+    private Collection $reservationItems;
 
+    public function __construct()
+    {
+        $this->reservationItems = new ArrayCollection();
+        $this->reserved_at = new \DateTimeImmutable();
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function updateTimestamps(): void
+    {
+        $this->updated_at = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
 
-    public function getReservedAt(): ?\DateTimeImmutable
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getReservedAt(): \DateTimeImmutable
     {
         return $this->reserved_at;
     }
@@ -82,16 +144,17 @@ class ProductReservation
         return $this;
     }
 
-    public function getWarehouse(): ?Warehouse
+    public function getExpiredAt(): ?\DateTimeImmutable
     {
-        return $this->warehouse;
+        return $this->expired_at;
     }
 
-    public function setWarehouse(Warehouse $warehouse): self
+    public function setExpiredAt(?\DateTimeImmutable $expired_at): self
     {
-        $this->warehouse = $warehouse;
+        $this->expired_at = $expired_at;
         return $this;
     }
+
     public function getComment(): ?string
     {
         return $this->comment;
@@ -103,7 +166,17 @@ class ProductReservation
         return $this;
     }
 
-    public function getItems(): PersistentCollection
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function getItems(): Collection
     {
         return $this->reservationItems;
     }

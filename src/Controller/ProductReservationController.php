@@ -16,8 +16,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 final class ProductReservationController extends AbstractController
 {
-    public function __construct(private ReservationService $reservationService)
-    {
+    public function __construct(
+        private ReservationService $reservationService,
+        private ProductReservationRepository $repository
+    ){
     }
 
     public function index(): Response
@@ -34,16 +36,19 @@ final class ProductReservationController extends AbstractController
     public function add(Request $request): JsonResponse
     {
         $data = $request->toArray();
+
         $result = $this->reservationService->reserve($data);
 
         return new JsonResponse(['message' => $result]);
     }
 
 
-    #[Route('/product/reservation/{id}', name: 'app_product_reservation_delete', methods: ['DELETE'])]
-    public function delete(ProductReservation $productReservation): JsonResponse
+    #[Route('/product/reservation/{id}/status_update', name: 'app_product_reservation_status_update', methods: ['PUT'])]
+    public function cancel(ProductReservation $reservation, Request $request): JsonResponse
     {
-        $this->reservationService->canselReservation($productReservation);
-        return new JsonResponse(['message' => 'Reservation deleted successfully'], Response::HTTP_NO_CONTENT);
+        $status = $request->toArray()['status'] ?? null;
+        $this->repository->updateStatus($status, $reservation);
+        return new JsonResponse(['message' => 'Reservation updated successfully'], Response::HTTP_OK);
     }
+
 }

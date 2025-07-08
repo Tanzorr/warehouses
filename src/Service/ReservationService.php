@@ -5,17 +5,15 @@ namespace App\Service;
 use App\Repository\ProductRepository;
 use App\Repository\ProductReservationItemRepository;
 use App\Repository\ProductReservationRepository;
-use App\Repository\WarehouseRepository;
 use App\Entity\ProductReservation;
 use App\Entity\Product;
-use App\Entity\Warehouse;
+use Symfony\Component\Validator\Constraints\Date;
 
 readonly class ReservationService
 {
     public function __construct(
         private ProductReservationRepository $reservationRepository,
         private ProductReservationItemRepository $itemRepository,
-        private WarehouseRepository $warehouseRepository,
         private ProductRepository $productRepository,
         private StockAvailabilityService $stockService
     ) {}
@@ -25,24 +23,34 @@ readonly class ReservationService
      */
     public function reserve(array $data): string
     {
-        $warehouse = $this->getWarehouse($data['warehouseId']);
-        $reservation = $this->createReservation($warehouse, $data['comment'] ?? null);
+        $expandedAt = (new \DateTimeImmutable())->add(new \DateInterval('PT15M'));
+        $reservation = $this->createReservation( $data['comment'] ?? null, $expandedAt);
 
         foreach ($data['products'] as $item) {
             $product = $this->getProduct($item['id']);
+            $error = $this->checkAccessedProducts($product->getId(), $item['amount']);
+
+            if($error){
+                $this->canselReservation($reservation);
+                return $error;
+            }
+
             $this->addReservationItem($product, $reservation, $item['amount']);
         }
 
         return (string) $reservation->getId();
     }
 
-    private function getWarehouse(int $id): Warehouse
+    private function checkAccessedProducts(int $productId, int $amount): string | null
     {
-        $warehouse = $this->warehouseRepository->find($id);
-        if (!$warehouse) {
-            throw new \InvalidArgumentException('Warehouse not found');
+        if (!$this->stockService->checkAccessedProductsInStock($productId,  $amount)) {
+            return sprintf(
+                '{"error": "Not enough stock for product ID %d in warehouse ID %d"}',
+                $productId,
+            );
         }
-        return $warehouse;
+
+        return null;
     }
 
     /**
@@ -53,37 +61,21 @@ readonly class ReservationService
         return $this->productRepository->getOrFailById($id);
     }
 
-    private function createReservation(Warehouse $warehouse, ?string $comment): ProductReservation
+    private function createReservation( ?string $comment, ?\DateTimeImmutable $expiredAt): ProductReservation
     {
-        $reservation = $this->reservationRepository->create($warehouse, $comment);
+        $reservation = $this->reservationRepository->create($comment, $expiredAt);
         $this->reservationRepository->save($reservation);
         return $reservation;
     }
 
     private function addReservationItem(Product $product, ProductReservation $reservation, int $amount): void
     {
-        if ($amount <= 0) {
-            throw new \InvalidArgumentException('Amount must be positive');
-        }
-
-        $warehouseId = $reservation->getWarehouse()->getId();
-        if (!$this->stockService->checkAccessedProductsInWarehouse($product->getId(), $warehouseId, $amount)) {
-            throw new \InvalidArgumentException("Not enough stock for product ID {$product->getId()} in warehouse ID $warehouseId");
-        }
-
-        $this->stockService->recalculateStockAdd($product->getId(), $warehouseId, $amount);
-
         $item = $this->itemRepository->create($product, $reservation, $amount);
         $this->itemRepository->save($item);
     }
 
     public function canselReservation(ProductReservation $reservation): void
     {
-        $warehouseId = $reservation->getWarehouse()->getId();
-        foreach ($reservation->getItems() as $item) {
-            $this->stockService->recalculateStockRemove($item->getProduct()->getId(), $warehouseId, $item->getAmount());
-        }
-
         $this->reservationRepository->remove($reservation);
     }
 }
