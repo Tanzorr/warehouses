@@ -47,6 +47,17 @@ class ProductReservationRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    public function  findExpiredPendingReservation(\DateTimeInterface $now): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.status = :status')
+            ->andWhere('r.expired_at < :now')
+            ->setParameter('status', ProductReservation::STATUS_PENDING)
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return ProductReservation[] Returns an array of ProductReservation objects
     //     */
