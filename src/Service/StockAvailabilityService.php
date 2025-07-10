@@ -39,7 +39,7 @@ readonly class StockAvailabilityService
                 $stocks = $this->repository->findByProductInStocks($product->getId());
                 $this->updatesStocksProductsAmount($stocks, $amount);
             }
-            return 'Commited';
+            return ProductReservation::STATUS_COMMITTED;
         }catch (\Exception $exception){
             return $exception->getMessage();
         }

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Constans\ReservationStatusMessage;
 use App\Repository\ProductRepository;
 use App\Repository\ProductReservationItemRepository;
 use App\Repository\ProductReservationRepository;
@@ -78,22 +79,46 @@ readonly class ReservationService
         $this->reservationRepository->remove($reservation);
     }
 
-    public function updateStatus($reservation, string $status): string
+    public function updateStatus(ProductReservation $reservation, string $newStatus): string
     {
-        if($reservation->getStatus() === $status){
-            return 'No change need';
-        }else if ($reservation->getStatus() === ProductReservation::STATUS_EXPIRED ) {
-            return 'Expired';
-        }else if($reservation->getStatus() === ProductReservation::STATUS_COMMITTED) {
-            return 'Committed';
-        }else if($reservation->getStatus() === ProductReservation::STATUS_CANCELED) {
-            return 'Canceled';
-        }else if($reservation->getStatus() === ProductReservation::STATUS_PENDING) {
-           return $this->stockService->commitReservation($reservation);
+        $currentStatus = $reservation->getStatus();
+
+        if ($currentStatus === $newStatus) {
+            return ReservationStatusMessage::NO_CHANGE;
         }
 
+        return  match ($currentStatus) {
+            ProductReservation::STATUS_EXPIRED => ReservationStatusMessage::EXPIRED,
+            ProductReservation::STATUS_COMMITTED => ReservationStatusMessage::COMMITTED,
+            ProductReservation::STATUS_CANCELED => ReservationStatusMessage::CANCELED,
+            ProductReservation::STATUS_PENDING => $this->handlingPending($reservation, $newStatus),
+            default => ReservationStatusMessage::INVALID_CHANGE,
+        };
+    }
 
-        $reservation->setStatus($status);
+    private function handlingPending(ProductReservation $reservation, string $newStatus):string
+    {
+        if($newStatus !== ProductReservation::STATUS_COMMITTED) {
+          return $this->updateReservationStatus($reservation, $newStatus, ReservationStatusMessage::STATUS_PENDING);
+        }
+
+        $result = $this->stockService->commitReservation($reservation);
+
+        if($result === ProductReservation::STATUS_COMMITTED) {
+            return $this->updateReservationStatus($reservation, $newStatus, ReservationStatusMessage::STATUS_COMMITTED);
+        }
+
+        return  $result;
+    }
+
+    private function updateReservationStatus(
+        ProductReservation $reservation,
+        string $newStatus,
+        string $message
+    ):string
+    {
+        $reservation->setStatus($newStatus);
         $this->reservationRepository->save($reservation);
+        return $message;
     }
 }
