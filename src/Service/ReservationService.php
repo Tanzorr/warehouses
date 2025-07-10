@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Constans\ReservationStatusMessage;
+use App\Constants\ReservationStatusMessage;
 use App\Repository\ProductRepository;
 use App\Repository\ProductReservationItemRepository;
 use App\Repository\ProductReservationRepository;
@@ -45,7 +45,7 @@ readonly class ReservationService
     {
         if (!$this->stockService->checkAccessedProductsInStock($productId,  $amount)) {
             return sprintf(
-                '{"error": "Not enough stock for product ID %d in warehouse ID %d"}',
+                '{"error": ReservationService::PRODUCT_NOT_IN_STOCK, "product_id": %d}',
                 $productId,
             );
         }

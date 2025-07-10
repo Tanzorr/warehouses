@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\ProductReservation;
-use App\Repository\ProductReservationRepository;
 use App\Service\ReservationService;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,8 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ProductReservationController extends AbstractController
 {
     public function __construct(
-        private ReservationService           $reservationService,
-        private ProductReservationRepository $repository
+        private readonly ReservationService $reservationService,
     )
     {
     }
@@ -26,7 +24,7 @@ final class ProductReservationController extends AbstractController
     public function index(): Response
     {
         return $this->render('product_reservation/index.html.twig', [
-            'controller_name' => 'ProductReservationController 4545',
+            'controller_name' => 'ProductReservationController',
         ]);
     }
 
@@ -48,11 +46,6 @@ final class ProductReservationController extends AbstractController
     public function update(ProductReservation $reservation, Request $request): JsonResponse
     {
         $status = $request->toArray()['status'] ?? null;
-        //if status is commited, check if reservation is not expired
-        // if reservation is expired return message reservation expired
-        //if reservation is not expired, update status to committed
-        // call recalculate stock service
-       // $this->repository->updateStatus($status, $reservation);
         return new JsonResponse(['message' => $this->reservationService->updateStatus($reservation, $status) ], Response::HTTP_OK);
     }
 }

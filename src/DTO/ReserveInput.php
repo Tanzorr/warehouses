@@ -21,10 +21,6 @@ class ReserveInput
 
     public function __construct()
     {
-//        $this->products = [
-//            new ReserveProductInput(1, 2),
-//            new ReserveProductInput(5, 1),
-//        ];
         $this->comment = 'Example comment';
     }
 }
