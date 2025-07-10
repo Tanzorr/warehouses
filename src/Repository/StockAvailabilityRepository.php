@@ -16,9 +16,12 @@ class StockAvailabilityRepository extends ServiceEntityRepository
         parent::__construct($registry, StockAvailability::class);
     }
 
-    public function findOneByProductInStocks(int $productId): ?array
+    public function findByProductInStocks(int $productId): ?array
     {
-        return $this->findBy(['product' => $productId]);
+        return $this->findBy(
+            ['product' => $productId],
+            ['amount' => 'ASC']
+        );
     }
 
     public function save(StockAvailability $stockAvailability): void

@@ -7,7 +7,6 @@ use App\Repository\ProductReservationItemRepository;
 use App\Repository\ProductReservationRepository;
 use App\Entity\ProductReservation;
 use App\Entity\Product;
-use Symfony\Component\Validator\Constraints\Date;
 
 readonly class ReservationService
 {
@@ -77,5 +76,24 @@ readonly class ReservationService
     public function canselReservation(ProductReservation $reservation): void
     {
         $this->reservationRepository->remove($reservation);
+    }
+
+    public function updateStatus($reservation, string $status): string
+    {
+        if($reservation->getStatus() === $status){
+            return 'No change need';
+        }else if ($reservation->getStatus() === ProductReservation::STATUS_EXPIRED ) {
+            return 'Expired';
+        }else if($reservation->getStatus() === ProductReservation::STATUS_COMMITTED) {
+            return 'Committed';
+        }else if($reservation->getStatus() === ProductReservation::STATUS_CANCELED) {
+            return 'Canceled';
+        }else if($reservation->getStatus() === ProductReservation::STATUS_PENDING) {
+           return $this->stockService->commitReservation($reservation);
+        }
+
+
+        $reservation->setStatus($status);
+        $this->reservationRepository->save($reservation);
     }
 }

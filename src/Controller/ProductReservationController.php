@@ -17,9 +17,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ProductReservationController extends AbstractController
 {
     public function __construct(
-        private ReservationService $reservationService,
+        private ReservationService           $reservationService,
         private ProductReservationRepository $repository
-    ){
+    )
+    {
     }
 
     public function index(): Response
@@ -44,11 +45,14 @@ final class ProductReservationController extends AbstractController
 
 
     #[Route('/product/reservation/{id}/status_update', name: 'app_product_reservation_status_update', methods: ['PUT'])]
-    public function cancel(ProductReservation $reservation, Request $request): JsonResponse
+    public function update(ProductReservation $reservation, Request $request): JsonResponse
     {
         $status = $request->toArray()['status'] ?? null;
-        $this->repository->updateStatus($status, $reservation);
-        return new JsonResponse(['message' => 'Reservation updated successfully'], Response::HTTP_OK);
+        //if status is commited, check if reservation is not expired
+        // if reservation is expired return message reservation expired
+        //if reservation is not expired, update status to committed
+        // call recalculate stock service
+       // $this->repository->updateStatus($status, $reservation);
+        return new JsonResponse(['message' => $this->reservationService->updateStatus($reservation, $status) ], Response::HTTP_OK);
     }
-
 }
