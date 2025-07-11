@@ -14,11 +14,11 @@ class ProductReservationListener
 
     public function preUpdate(ProductReservation $productReservation, PreUpdateEventArgs $args): void
     {
+
         if (
             $args->hasChangedField('status')
-            && $productReservation->getStatus() === ProductReservation::STATUS_COMMITTED
         ) {
-            $this->stockAvailabilityService->commitReservation($productReservation);
+            //$this->stockAvailabilityService->commitReservation($productReservation);
         }
     }
 }

@@ -53,7 +53,7 @@ class ProductReservation
         ],
         message: ReservationStatusMessage::ERROR_WRONG_STATUS
     )]
-    #[Groups([self::GROUP_CREATE, self::GROUP_UPDATE])]
+    #[Groups([self::GROUP_UPDATE])]
     public string $status = self::STATUS_PENDING;
 
     #[ORM\Column]
