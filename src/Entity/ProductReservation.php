@@ -6,9 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\ProductReservationController;
-use App\DTO\ReservationStatusInput;
-use App\DTO\ReserveInput;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,12 +17,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
-
         ),
         new Put(
             denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
-
-        )
+        ),
+        new Delete()
     ]
 )]
 #[ORM\Entity]
@@ -35,10 +32,10 @@ class ProductReservation
     const GROUP_CREATE = 'product_reservation_create';
     const GROUP_UPDATE = 'product_reservation_update';
 
-    public const STATUS_PENDING = 'Pending';
-    public const STATUS_CANCELED = 'Canceled';
-    public const STATUS_EXPIRED = 'Expired';
-    public const STATUS_COMMITTED = 'Committed';
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_EXPIRED = 'expired';
+    public const STATUS_COMMITTED = 'committed';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
