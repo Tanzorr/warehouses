@@ -16,9 +16,10 @@ class ProductReservationListener
     {
 
         if (
-            $args->hasChangedField('status')
+            $args->hasChangedField('status') &&
+            $args->getNewValue('status') === ProductReservation::STATUS_COMMITTED
         ) {
-            //$this->stockAvailabilityService->commitReservation($productReservation);
+            $this->stockAvailabilityService->commitReservation($productReservation);
         }
     }
 }

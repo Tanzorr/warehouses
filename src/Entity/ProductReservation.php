@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 
@@ -13,13 +14,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Flex\Path;
 
 #[ApiResource(
     operations: [
         new Post(
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
         ),
-        new Put(
+        new Patch( // 👈 тут має бути Patch
             denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
         ),
         new Delete()
@@ -53,7 +55,7 @@ class ProductReservation
         ],
         message: ReservationStatusMessage::ERROR_WRONG_STATUS
     )]
-    #[Groups([self::GROUP_UPDATE])]
+    #[Groups([self::GROUP_CREATE, self::GROUP_UPDATE])]
     public string $status = self::STATUS_PENDING;
 
     #[ORM\Column]
@@ -79,9 +81,9 @@ class ProductReservation
         targetEntity: ProductReservationItem::class,
         mappedBy: 'productReservation',
         cascade: ['persist', 'remove'],
-        orphanRemoval: true
+        orphanRemoval: true,
     )]
-    #[Groups(self::GROUP_CREATE)]
+    #[Groups([self::GROUP_CREATE])]
     private Collection $items;
 
     public function __construct()
