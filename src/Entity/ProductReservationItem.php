@@ -4,10 +4,13 @@ namespace App\Entity;
 
 use App\Repository\ProductReservationItemRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProductReservationItemRepository::class)]
 class ProductReservationItem
 {
+    const GROUP_CREATE = 'product_reservation_item_create';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,9 +21,11 @@ class ProductReservationItem
     private ProductReservation $productReservation;
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "reservationItems")]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(self::GROUP_CREATE)]
     private ?Product $product = null;
 
     #[ORM\Column]
+    #[Groups(self::GROUP_CREATE)]
     private ?int $amount = null;
 
     public function getId(): ?int

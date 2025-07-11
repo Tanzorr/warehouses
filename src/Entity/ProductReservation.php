@@ -12,22 +12,28 @@ use App\DTO\ReserveInput;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
         new Post(
-            routeName: 'app_product_reserve_add',
-            controller: ProductReservationController::class,
-            input: ReserveInput::class
+//            routeName: 'app_product_reserve_add',
+//            controller: ProductReservationController::class,
+//            input: ReserveInput::class
+
+            denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
+
         ),
         new Put(
-            uriTemplate: '/product/reservation/{id}/staus_update',
-            routeName: 'app_product_reservation_status_update',
-            requirements: ['id' => '\d+'],
-            controller: ProductReservationController::class,
-            input: ReservationStatusInput::class,
-            name: 'app_product_reservation_cancel',
+//            uriTemplate: '/product/reservation/{id}/staus_update',
+//            routeName: 'app_product_reservation_status_update',
+//            requirements: ['id' => '\d+'],
+//            controller: ProductReservationController::class,
+//            input: ReservationStatusInput::class,
+//            name: 'app_product_reservation_cancel',
+            denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
+
         ),
         new Delete(
             uriTemplate: '/product/reservation/{id}',
@@ -40,8 +46,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\EntityListeners(['App\EventListener\ProductReservationListener'])]
 class ProductReservation
 {
+    const GROUP_CREATE = 'product_reservation_create';
+    const GROUP_UPDATE = 'product_reservation_update';
+
     public const STATUS_PENDING = 'Pending';
     public const STATUS_CANCELED = 'Canceled';
     public const STATUS_EXPIRED = 'Expired';
@@ -62,9 +72,8 @@ class ProductReservation
         ],
         message: 'Status must be one of: active, pending, canceled.'
     )]
-    public string $status;
-
-
+    #[Groups([self::GROUP_CREATE, self::GROUP_UPDATE])]
+    public string $status = self::STATUS_PENDING;
 
     #[ORM\Column]
     private \DateTimeImmutable $reserved_at;
@@ -76,6 +85,7 @@ class ProductReservation
     private ?\DateTimeImmutable $expired_at = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(self::GROUP_CREATE)]
     private ?string $comment = null;
 
     #[ORM\Column]
@@ -90,11 +100,12 @@ class ProductReservation
         cascade: ['persist', 'remove'],
         orphanRemoval: true
     )]
-    private Collection $reservationItems;
+    #[Groups(self::GROUP_CREATE)]
+    private Collection $items;
 
     public function __construct()
     {
-        $this->reservationItems = new ArrayCollection();
+        $this->items = new ArrayCollection();
         $this->reserved_at = new \DateTimeImmutable();
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
@@ -178,13 +189,13 @@ class ProductReservation
 
     public function getItems(): Collection
     {
-        return $this->reservationItems;
+        return $this->items;
     }
 
     public function addItem(ProductReservationItem $item): self
     {
-        if (!$this->reservationItems->contains($item)) {
-            $this->reservationItems[] = $item;
+        if (!$this->items->contains($item)) {
+            $this->items[] = $item;
             $item->setProductReservation($this);
         }
         return $this;
@@ -192,7 +203,7 @@ class ProductReservation
 
     public function removeItem(ProductReservationItem $item): self
     {
-        if ($this->reservationItems->removeElement($item)) {
+        if ($this->items->removeElement($item)) {
             if ($item->getProductReservation() === $this) {
                 $item->setProductReservation(null);
             }
