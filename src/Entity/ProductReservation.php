@@ -18,29 +18,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new Post(
-//            routeName: 'app_product_reserve_add',
-//            controller: ProductReservationController::class,
-//            input: ReserveInput::class
-
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
 
         ),
         new Put(
-//            uriTemplate: '/product/reservation/{id}/staus_update',
-//            routeName: 'app_product_reservation_status_update',
-//            requirements: ['id' => '\d+'],
-//            controller: ProductReservationController::class,
-//            input: ReservationStatusInput::class,
-//            name: 'app_product_reservation_cancel',
             denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
 
-        ),
-        new Delete(
-            uriTemplate: '/product/reservation/{id}',
-            routeName: 'app_product_reservation_delete',
-            requirements: ['id' => '\d+'],
-            controller: ProductReservationController::class,
-            name: 'app_product_reservation_delete'
         )
     ]
 )]
