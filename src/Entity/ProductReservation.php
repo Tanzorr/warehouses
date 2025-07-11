@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 
+use App\Constants\ReservationStatusMessage;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -50,7 +51,7 @@ class ProductReservation
             self::STATUS_COMMITTED,
             self::STATUS_PENDING
         ],
-        message: 'Status must be one of: active, pending, canceled.'
+        message: ReservationStatusMessage::ERROR_WRONG_STATUS
     )]
     #[Groups([self::GROUP_CREATE, self::GROUP_UPDATE])]
     public string $status = self::STATUS_PENDING;

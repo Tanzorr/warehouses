@@ -21,9 +21,11 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
-#    App\EventListener\ProductReservationListener:
-#    App\Service\StockAvailabilityService:
+    App\Service\StockAvailabilityService: ~
+    App\EventListener\ProductReservationListener:
+        arguments:
+            $stockAvailabilityService: '@App\Service\StockAvailabilityService'
+        tags: [ 'doctrine.orm.entity_listener' ]
 
 
 #    App\Service\ExchangeRateService:

@@ -13,5 +13,7 @@ class ReservationStatusMessage
     public const INVALID_CHANGE  = 'Invalid status change';
 
     public const NOT_ENOUGH_STOCK = 'Not enough stock';
+
+    public const ERROR_WRONG_STATUS = 'Status must be one of: active, pending, canceled';
     const STATUS_PENDING = 'Pending';
 }
