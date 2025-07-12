@@ -15,5 +15,7 @@ class ReservationStatusMessage
     public const NOT_ENOUGH_STOCK = 'Not enough stock';
 
     public const ERROR_WRONG_STATUS = 'Status must be one of: active, pending, canceled';
+
+    public const ERROR_WRONG_AMOUNT = "Insufficient stock or invalid quantity specified ({{ value }} / available: {{ available }}).";
     const STATUS_PENDING = 'Pending';
 }

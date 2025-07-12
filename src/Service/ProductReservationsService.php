@@ -15,5 +15,4 @@ class ProductReservationsService
         $amount = $this->productReservationItemRepository->getProductsReservationItemsAmount($product);
         return $amount || 0;
     }
-
 }
