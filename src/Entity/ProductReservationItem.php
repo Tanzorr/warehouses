@@ -5,7 +5,9 @@ namespace App\Entity;
 use App\Repository\ProductReservationItemRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use App\Validator\Constraints as CustomAssert;
 
+#[CustomAssert\ReservationItemAmount]
 #[ORM\Entity(repositoryClass: ProductReservationItemRepository::class)]
 class ProductReservationItem
 {

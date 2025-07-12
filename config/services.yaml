@@ -26,6 +26,10 @@ services:
         arguments:
             $stockAvailabilityService: '@App\Service\StockAvailabilityService'
         tags: [ 'doctrine.orm.entity_listener' ]
+    App\Validator\Constraints\ReservationItemAmountValidator:
+        arguments:
+            $stockAvailabilityService: '@App\Service\StockAvailabilityService'
+        tags: [ 'validator.constraint_validator' ]
 
 
 #    App\Service\ExchangeRateService:

@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 
 use App\Constants\ReservationStatusMessage;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,14 +13,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Flex\Path;
+
 
 #[ApiResource(
     operations: [
         new Post(
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
         ),
-        new Patch( // 👈 тут має бути Patch
+        new Patch(
             denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
         ),
         new Delete()
@@ -84,6 +83,7 @@ class ProductReservation
         orphanRemoval: true,
     )]
     #[Groups([self::GROUP_CREATE])]
+    #[Assert\Valid]
     private Collection $items;
 
     public function __construct()
