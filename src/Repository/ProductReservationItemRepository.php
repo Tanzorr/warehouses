@@ -37,7 +37,16 @@ class ProductReservationItemRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    //    /**
+    public function getProductsReservationItemsAmount(Product $product)
+    {
+        return $this->createQueryBuilder('p')
+            ->select('SUM(p.amount) as totalAmount')
+            ->andWhere('p.product = :product')
+            ->setParameter('product', $product)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+    }
     //     * @return ProductReservationItem[] Returns an array of ProductReservationItem objects
     //     */
     //    public function findByExampleField($value): array

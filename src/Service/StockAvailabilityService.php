@@ -2,23 +2,29 @@
 
 namespace App\Service;
 
+use App\Entity\Product;
 use App\Entity\ProductReservation;
 use App\Repository\StockAvailabilityRepository;
 
 readonly class StockAvailabilityService
 {
-    public function __construct(private StockAvailabilityRepository $repository)
+    public function __construct(
+        private StockAvailabilityRepository $repository,
+        private ProductReservationsService $reservationsService
+    )
     {
     }
 
-    public function checkAccessedProductsInStock(int $productId, int $amount): bool
+    public function checkAccessedProductsInStock(Product $product, int $amount): bool
     {
         if ($amount <= 0) {
             return false;
         }
 
-        $stocks = $this->repository->findByProductInStocks($productId);
-        return $this->getStocksAmount($stocks) > $amount;
+        $reservedAmount = $this->reservationsService->getReservedProductsAmount($product);
+
+        $stocks = $this->repository->findByProductInStocks($product->getId());
+        return $this->getStocksAmount($stocks) > ($amount + $reservedAmount);
     }
 
     private function getStocksAmount(array $stocks): int
@@ -60,5 +66,12 @@ readonly class StockAvailabilityService
                 $this->repository->save($stock);
             }
         }
+    }
+
+    public function getAvailableStock(Product $product):int
+    {    $stocks = $this->repository->findByProductInStocks($product->getId());
+        $allAmountInStocks = $this->getStocksAmount($stocks);
+        $reservedAmount = $this->reservationsService->getReservedProductsAmount($product);
+        return $allAmountInStocks - $reservedAmount;
     }
 }
