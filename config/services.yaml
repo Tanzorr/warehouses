@@ -21,19 +21,29 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
-    App\Service\ExchangeRateService:
+    App\Service\StockAvailabilityService: ~
+    App\EventListener\ProductReservationListener:
         arguments:
-            $apiUrl: '%exchange_rate.api_url%'
-            $supportedCurrencies: '%exchange_rate.supported_currencies%'
-
-
-    App\Service\RequestValidator:
-            arguments:
-                $validator: '@validator'
-    App\Service\ExchangeRateRequestHandler:
+            $stockAvailabilityService: '@App\Service\StockAvailabilityService'
+        tags: [ 'doctrine.orm.entity_listener' ]
+    App\Validator\Constraints\ReservationItemAmountValidator:
         arguments:
-            $rateService: '@App\Service\ExchangeRateService'
-            $validator: '@App\Service\RequestValidator'
+            $stockAvailabilityService: '@App\Service\StockAvailabilityService'
+        tags: [ 'validator.constraint_validator' ]
+
+
+#    App\Service\ExchangeRateService:
+#        arguments:
+#            $apiUrl: '%exchange_rate.api_url%'
+#            $supportedCurrencies: '%exchange_rate.supported_currencies%'
+#
+#
+#    App\Service\RequestValidator:
+#            arguments:
+#                $validator: '@validator'
+#    App\Service\ExchangeRateRequestHandler:
+#        arguments:
+#            $rateService: '@App\Service\ExchangeRateService'
+#            $validator: '@App\Service\RequestValidator'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
