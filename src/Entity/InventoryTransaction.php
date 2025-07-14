@@ -15,50 +15,50 @@ class InventoryTransaction
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $entity_id = null;
+    private ?int $entityId = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?int $warehouse_id = null;
+    private ?int $warehouseId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $comment = null;
 
     #[ORM\Column]
-    private ?int $product_id = null;
+    private ?int $productId = null;
 
     #[ORM\Column]
     private ?int $quantity = null;
 
     #[ORM\Column]
-    private ?string $entity_type = null;
+    private ?string $entityType = null;
 
     #[ORM\Column]
-    private ?int $user_id = null;
+    private ?int $userId = null;
 
     public function __construct(
         ?int                $id = null,
-        ?int                $entity_id = null,
-        ?\DateTimeImmutable $created_at = null,
-        ?int                $warehouse_id = null,
+        ?int                $entityId = null,
+        ?\DateTimeImmutable $createdAt = null,
+        ?int                $warehouseId = null,
         ?string             $comment = null,
-        ?int                $product_id = null,
+        ?int                $productId = null,
         ?int                $quantity = null,
-        ?int                $user_id = null
-        , ?string           $entity_type = null
+        ?int                $userId = null
+        , ?string           $entitType = null
     )
     {
         $this->id = $id;
-        $this->created_at = $created_at ?: new \DateTimeImmutable();
-        $this->warehouse_id = $warehouse_id;
-        $this->entity_id = $entity_id;
+        $this->createdAt = $createdAt ?: new \DateTimeImmutable();
+        $this->warehouseId = $warehouseId;
+        $this->entityId = $entityId;
         $this->comment = $comment;
-        $this->product_id = $product_id;
+        $this->productId = $productId;
         $this->quantity = $quantity;
-        $this->user_id = $user_id;
-        $this->entity_type = $entity_type ?? 'inventory_transaction';
+        $this->userId = $userId;
+        $this->entityType = $entitType ?? 'inventory_transaction';
     }
 
     public function getId(): ?int
@@ -74,34 +74,34 @@ class InventoryTransaction
 
     public function getEntityId(): ?int
     {
-        return $this->entity_id;
+        return $this->entityId;
     }
 
     public function setEntityId(int $reservation_id): static
     {
-        $this->entity_id = $reservation_id;
+        $this->entityId = $reservation_id;
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
         return $this;
     }
 
     public function getWarehouseId(): ?int
     {
-        return $this->warehouse_id;
+        return $this->warehouseId;
     }
 
-    public function setWarehouseId(int $warehouse_id): static
+    public function setWarehouseId(int $warehouseId): static
     {
-        $this->warehouse_id = $warehouse_id;
+        $this->warehouseId = $warehouseId;
         return $this;
     }
 
@@ -118,12 +118,12 @@ class InventoryTransaction
 
     public function getProductId(): ?int
     {
-        return $this->product_id;
+        return $this->productId;
     }
 
-    public function setProductId(int $product_id): static
+    public function setProductId(int $productId): static
     {
-        $this->product_id = $product_id;
+        $this->productId = $productId;
 
         return $this;
     }
@@ -142,25 +142,25 @@ class InventoryTransaction
 
     public function getUserId(): ?int
     {
-        return $this->user_id;
+        return $this->userId;
     }
 
-    public function setUserId(int $user_id): static
+    public function setUserId(int $userId): static
     {
-        $this->user_id = $user_id;
+        $this->userId = $userId;
 
         return $this;
     }
 
     public function getEntityType(): ?string
     {
-        return $this->entity_type;
+        return $this->entityType;
     }
 
 
-    public function setEntityType(string $entity_type): static
+    public function setEntityType(string $entityType): static
     {
-        $this->entity_type = $entity_type;
+        $this->entityType = $entityType;
 
         return $this;
     }
