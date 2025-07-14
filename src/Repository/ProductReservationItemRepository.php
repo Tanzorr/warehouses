@@ -37,9 +37,9 @@ class ProductReservationItemRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function getProductsReservationItemsAmount(Product $product)
+    public function getProductsReservationItemsAmount(Product $product):int
     {
-        return $this->createQueryBuilder('p')
+        return (int) $this->createQueryBuilder('p')
             ->select('SUM(p.amount) as totalAmount')
             ->andWhere('p.product = :product')
             ->setParameter('product', $product)
