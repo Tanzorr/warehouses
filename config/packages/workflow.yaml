@@ -1,0 +1,18 @@
+framework:
+  workflows:
+    product_reservation_workflow:
+        type: 'state_machine'
+        supports:
+            - App\Entity\ProductReservation
+        initial_marking: 'pending'
+        places:
+            - 'pending'
+            - 'committed'
+            - 'cancelled'
+        transitions:
+            commit:
+                from: 'pending'
+                to: 'commited'
+            cancel:
+                from: 'pending'
+                to: 'cancelled'
