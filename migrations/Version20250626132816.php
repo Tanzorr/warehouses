@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250220094605 extends AbstractMigration
+final class Version20250626132816 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,16 @@ final class Version20250220094605 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE exchange_rates (id INT AUTO_INCREMENT NOT NULL, currency_pair VARCHAR(255) NOT NULL, rate NUMERIC(10, 0) NOT NULL, recorded_at TIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql(<<<'SQL'
+            ALTER TABLE product_reservation_item CHANGE product_reservation_id product_reservation_id INT NOT NULL, CHANGE product_id product_id INT NOT NULL
+        SQL);
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP TABLE exchange_rates');
+        $this->addSql(<<<'SQL'
+            ALTER TABLE product_reservation_item CHANGE product_reservation_id product_reservation_id INT DEFAULT NULL, CHANGE product_id product_id INT DEFAULT NULL
+        SQL);
     }
 }
