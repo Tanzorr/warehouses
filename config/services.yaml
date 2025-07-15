@@ -30,7 +30,9 @@ services:
         arguments:
             $stockAvailabilityService: '@App\Service\StockAvailabilityService'
         tags: [ 'validator.constraint_validator' ]
-
+    App\EventSubscriber\ProductReservationWorkflowSubscriber:
+        arguments:
+            $stockAvailabilityService: '@App\Service\StockAvailabilityService'
 
 #    App\Service\ExchangeRateService:
 #        arguments:
