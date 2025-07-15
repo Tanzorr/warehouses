@@ -7,7 +7,7 @@ framework:
         initial_marking: 'pending'
         places:
             - 'pending'
-            - 'commited'
+            - 'committed'
             - 'cancelled'
         transitions:
             commit:
