@@ -12,7 +12,7 @@ framework:
         transitions:
             commit:
                 from: 'pending'
-                to: 'commited'
+                to: 'committed'
             cancel:
                 from: 'pending'
                 to: 'cancelled'
