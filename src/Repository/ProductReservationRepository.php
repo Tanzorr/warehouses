@@ -22,7 +22,6 @@ class ProductReservationRepository extends ServiceEntityRepository
     {
         return  (new ProductReservation())
             ->setReservedAt(new \DateTimeImmutable())
-            ->setExpiredAt($expiredAt)
             ->setStatus(ProductReservation::STATUS_PENDING)
             ->setComment($comment);
     }
