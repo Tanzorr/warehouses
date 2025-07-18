@@ -28,6 +28,7 @@ readonly class ProductReservationWorkflowSubscriber implements EventSubscriberIn
     {
         $reservation = $this->getReservation($event);
         $this->stockAvailabilityService->commitReservation($reservation);
+        $reservation->setStatus(ProductReservation::STATUS_COMMITTED);
         $this->reservationRepository->save($reservation);
     }
 

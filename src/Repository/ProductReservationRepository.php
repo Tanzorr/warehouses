@@ -28,15 +28,7 @@ class ProductReservationRepository extends ServiceEntityRepository
 
     public function save(ProductReservation $reservation): void
     {
-        $this->getEntityManager()->persist($reservation);
-        $this->getEntityManager()->flush();
-    }
-
-    public function updateStatus(string $status, ProductReservation $reservation): void
-    {
-        $reservation->setStatus($status);
-        $this->getEntityManager()->persist($reservation);
-        $this->getEntityManager()->flush();
+        $this->persistAndFlush($reservation);
     }
 
 
@@ -55,6 +47,12 @@ class ProductReservationRepository extends ServiceEntityRepository
             ->setParameter('now', $now)
             ->getQuery()
             ->getResult();
+    }
+
+    private function persistAndFlush(ProductReservation $reservation): void
+    {
+        $this->getEntityManager()->persist($reservation);
+        $this->getEntityManager()->flush();
     }
 
     //    /**
