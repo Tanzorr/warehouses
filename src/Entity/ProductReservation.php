@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\Link;
 
 
 #[ApiResource(
@@ -22,11 +23,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         // есть нюанс с полем статуса - его нужно менять только через workflow, а значит прямой patch нам не подходит
         new Patch(
-            denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
+            uriTemplate: '/product_reservations/{id}/{action}',
+            uriVariables: [
+                'id' => new Link(fromClass: ProductReservation::class),
+                'action' => new Link(fromClass: null),
+            ],
+            input: null, // ❗ вимикаємо автодесеріалізацію
             processor: ProductReservationTransitionProcessor::class,
-            uriTemplate: "/product_reservations/{id}/{action}",
-            input: [],
-            uriVariables: ['id']
         ),
         new Delete()
     ]
