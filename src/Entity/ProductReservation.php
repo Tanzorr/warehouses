@@ -6,7 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-
+use App\ApiResource\StateProcessor\ProductReservationTransitionProcessor;
 use App\Constants\ReservationStatusMessage;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,8 +20,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
         ),
+        // есть нюанс с полем статуса - его нужно менять только через workflow, а значит прямой patch нам не подходит
         new Patch(
             denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
+            processor: ProductReservationTransitionProcessor::class,
+            uriTemplate: "/product_reservations/{id}/{action}",
+            input: [],
+            uriVariables: ['id']
         ),
         new Delete()
     ]
@@ -174,7 +179,7 @@ class ProductReservation
     {
         if ($this->items->removeElement($item)) {
             if ($item->getProductReservation() === $this) {
-                $item->setProductReservation(null);
+                $item->setProductReservation(null); // type incompatibility
             }
         }
         return $this;
