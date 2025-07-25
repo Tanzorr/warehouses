@@ -38,7 +38,6 @@ readonly class StockAvailabilityService
 
     public function commitReservation(ProductReservation $reservation): string
     {
-
         try {
             foreach ($reservation->getItems() as $item) {
                 $product = $item->getProduct();

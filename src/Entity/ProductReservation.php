@@ -6,13 +6,14 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-
+use App\ApiResource\StateProcessor\ProductReservationTransitionProcessor;
 use App\Constants\ReservationStatusMessage;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\Link;
 
 
 #[ApiResource(
@@ -20,8 +21,15 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
         ),
+        // есть нюанс с полем статуса - его нужно менять только через workflow, а значит прямой patch нам не подходит
         new Patch(
-            denormalizationContext: ['groups' => [self::GROUP_UPDATE]],
+            uriTemplate: '/product_reservations/{id}/{action}',
+            uriVariables: [
+                'id' => new Link(fromClass: ProductReservation::class),
+                'action' => new Link(fromClass: null),
+            ],
+            input: null, // ❗ вимикаємо автодесеріалізацію
+            processor: ProductReservationTransitionProcessor::class,
         ),
         new Delete()
     ]
@@ -36,7 +44,6 @@ class ProductReservation
 
     public const STATUS_PENDING = 'pending';
     public const STATUS_CANCELED = 'canceled';
-    public const STATUS_EXPIRED = 'expired';
     public const STATUS_COMMITTED = 'committed';
 
     #[ORM\Id]
@@ -48,7 +55,6 @@ class ProductReservation
     #[Assert\Choice(
         choices: [
             self::STATUS_CANCELED,
-            self::STATUS_EXPIRED,
             self::STATUS_COMMITTED,
             self::STATUS_PENDING
         ],
@@ -58,23 +64,21 @@ class ProductReservation
     public string $status = self::STATUS_PENDING;
 
     #[ORM\Column]
-    private \DateTimeImmutable $reserved_at;
+    private \DateTimeImmutable $reservedAt;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $released_at = null;
+    private ?\DateTimeImmutable $releasedAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $expired_at = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(self::GROUP_CREATE)]
     private ?string $comment = null;
 
     #[ORM\Column]
-    private \DateTimeImmutable $created_at;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
-    private \DateTimeImmutable $updated_at;
+    private \DateTimeImmutable $updatedAt;
 
     #[ORM\OneToMany(
         targetEntity: ProductReservationItem::class,
@@ -86,18 +90,20 @@ class ProductReservation
     #[Assert\Valid]
     private Collection $items;
 
+    private ?string $marking = null;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
-        $this->reserved_at = new \DateTimeImmutable();
-        $this->created_at = new \DateTimeImmutable();
-        $this->updated_at = new \DateTimeImmutable();
+        $this->reservedAt = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function updateTimestamps(): void
     {
-        $this->updated_at = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -118,37 +124,25 @@ class ProductReservation
 
     public function getReservedAt(): \DateTimeImmutable
     {
-        return $this->reserved_at;
+        return $this->reservedAt;
     }
 
-    public function setReservedAt(\DateTimeImmutable $reserved_at): self
+    public function setReservedAt(\DateTimeImmutable $reservedAt): self
     {
-        $this->reserved_at = $reserved_at;
+        $this->reservedAt = $reservedAt;
         return $this;
     }
 
     public function getReleasedAt(): ?\DateTimeImmutable
     {
-        return $this->released_at;
+        return $this->releasedAt;
     }
 
-    public function setReleasedAt(?\DateTimeImmutable $released_at): self
+    public function setReleasedAt(?\DateTimeImmutable $releasedAt): self
     {
-        $this->released_at = $released_at;
+        $this->releasedAt = $releasedAt;
         return $this;
     }
-
-    public function getExpiredAt(): ?\DateTimeImmutable
-    {
-        return $this->expired_at;
-    }
-
-    public function setExpiredAt(?\DateTimeImmutable $expired_at): self
-    {
-        $this->expired_at = $expired_at;
-        return $this;
-    }
-
     public function getComment(): ?string
     {
         return $this->comment;
@@ -162,12 +156,12 @@ class ProductReservation
 
     public function getCreatedAt(): \DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     public function getUpdatedAt(): \DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
     public function getItems(): Collection
@@ -188,10 +182,20 @@ class ProductReservation
     {
         if ($this->items->removeElement($item)) {
             if ($item->getProductReservation() === $this) {
-                $item->setProductReservation(null);
+                $item->setProductReservation(null); // type incompatibility
             }
         }
         return $this;
+    }
+
+    public function getMarking(): ?string
+    {
+        return $this->marking;
+    }
+
+    public function setMarking(?string $marking): void
+    {
+        $this->marking = $marking;
     }
 
     public function __toString(): string
