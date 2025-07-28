@@ -15,29 +15,29 @@ class ProductReservationListener
         private readonly Registry          $workflowRegistry,
     ) {}
 
-    public function preUpdate(ProductReservation $productReservation, PreUpdateEventArgs $args): void
-    {
+    // public function preUpdate(ProductReservation $productReservation, PreUpdateEventArgs $args): void
+    // {
 
-        if (!$args->hasChangedField('status')) {
-            return;
-        }
+    //     if (!$args->hasChangedField('status')) {
+    //         return;
+    //     }
 
-        $oldStatus = $args->getOldValue('status');
-        $newStatus = $args->getNewValue('status');
+    //     $oldStatus = $args->getOldValue('status');
+    //     $newStatus = $args->getNewValue('status');
 
-        $workflow = $this->workflowRegistry->get($productReservation, self::WORKFLOW_NAME);
+    //     $workflow = $this->workflowRegistry->get($productReservation, self::WORKFLOW_NAME);
 
 
-        if ($oldStatus === ProductReservation::STATUS_PENDING && $newStatus === ProductReservation::STATUS_COMMITTED) {
-            if ($workflow->can($productReservation, 'commit')) {
-                $workflow->apply($productReservation, 'commit');
-            }
-        }
+    //     if ($oldStatus === ProductReservation::STATUS_PENDING && $newStatus === ProductReservation::STATUS_COMMITTED) {
+    //         if ($workflow->can($productReservation, 'commit')) {
+    //             $workflow->apply($productReservation, 'commit');
+    //         }
+    //     }
 
-        if ($oldStatus === ProductReservation::STATUS_PENDING && $newStatus === ProductReservation::STATUS_CANCELED) {
-            if ($workflow->can($productReservation, 'cancel')) {
-                $workflow->apply($productReservation, 'cancel');
-            }
-        }
-    }
+    //     if ($oldStatus === ProductReservation::STATUS_PENDING && $newStatus === ProductReservation::STATUS_CANCELED) {
+    //         if ($workflow->can($productReservation, 'cancel')) {
+    //             $workflow->apply($productReservation, 'cancel');
+    //         }
+    //     }
+    // }
 }

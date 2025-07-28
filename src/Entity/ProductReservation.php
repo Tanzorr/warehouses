@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\ApiProperty;
 use App\ApiResource\StateProcessor\ProductReservationTransitionProcessor;
 use App\Constants\ReservationStatusMessage;
+use App\DTO\ReservationStatusInput;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,18 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]]
         ),
         new Patch(
-            uriTemplate: '/product_reservations/{id}/{action}',
-            uriVariables: [
-                'id' => new Link(
-                    fromClass: self::class,
-                    identifiers: ['id']
-                ),
-                'action' => new Link(
-                    fromClass: self::class,
-                    identifiers: ['status']
-                )
-            ],
-            input: null,
+            input: ReservationStatusInput::class,
             processor: ProductReservationTransitionProcessor::class
         ),
         new Delete()
