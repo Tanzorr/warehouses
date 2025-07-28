@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\ApiProperty;
 use App\ApiResource\StateProcessor\ProductReservationTransitionProcessor;
 use App\Constants\ReservationStatusMessage;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,23 +15,26 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\Link;
-
 
 #[ApiResource(
     operations: [
         new Post(
-            denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]],
+            denormalizationContext: ['groups' => [self::GROUP_CREATE, ProductReservationItem::GROUP_CREATE]]
         ),
-        // есть нюанс с полем статуса - его нужно менять только через workflow, а значит прямой patch нам не подходит
         new Patch(
             uriTemplate: '/product_reservations/{id}/{action}',
             uriVariables: [
-                'id' => new Link(fromClass: ProductReservation::class),
-                'action' => new Link(fromClass: null),
+                'id' => new Link(
+                    fromClass: self::class,
+                    identifiers: ['id']
+                ),
+                'action' => new Link(
+                    fromClass: self::class,
+                    identifiers: ['status']
+                )
             ],
-            input: null, // ❗ вимикаємо автодесеріалізацію
-            processor: ProductReservationTransitionProcessor::class,
+            input: null,
+            processor: ProductReservationTransitionProcessor::class
         ),
         new Delete()
     ]
@@ -69,7 +74,6 @@ class ProductReservation
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $releasedAt = null;
 
-
     #[ORM\Column(nullable: true)]
     #[Groups(self::GROUP_CREATE)]
     private ?string $comment = null;
@@ -84,7 +88,7 @@ class ProductReservation
         targetEntity: ProductReservationItem::class,
         mappedBy: 'productReservation',
         cascade: ['persist', 'remove'],
-        orphanRemoval: true,
+        orphanRemoval: true
     )]
     #[Groups([self::GROUP_CREATE])]
     #[Assert\Valid]
@@ -143,6 +147,7 @@ class ProductReservation
         $this->releasedAt = $releasedAt;
         return $this;
     }
+
     public function getComment(): ?string
     {
         return $this->comment;
@@ -182,7 +187,7 @@ class ProductReservation
     {
         if ($this->items->removeElement($item)) {
             if ($item->getProductReservation() === $this) {
-                $item->setProductReservation(null); // type incompatibility
+                $item->setProductReservation(null);
             }
         }
         return $this;
