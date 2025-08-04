@@ -43,7 +43,6 @@ readonly class StockAvailabilityService
                 $product = $item->getProduct();
                 $amount = $item->getAmount();
                 $stocks = $this->repository->findByProductInStocks($product->getId());
-
                 $this->updatesStocksProductsAmount($stocks, $amount);
             }
             return ProductReservation::STATUS_COMMITTED;

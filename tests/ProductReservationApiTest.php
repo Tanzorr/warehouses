@@ -12,7 +12,6 @@ use App\Entity\Warehouse;
 use App\Entity\Stock; // Assuming you have a Stock entity to manage inventory.
 use App\Entity\StockAvailability;
 use Doctrine\ORM\EntityManagerInterface;
-use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
