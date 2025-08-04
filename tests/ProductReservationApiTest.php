@@ -1,5 +1,4 @@
 <?php
-// tests/Api/ProductReservationApiTest.php
 
 namespace App\Tests\Api;
 
@@ -32,6 +31,11 @@ class ProductReservationApiTest extends ApiTestCase
 //    use RefreshDatabaseTrait;
 
     private ?EntityManagerInterface $entityManager;
+
+    protected static function getKernelClass(): string
+    {
+        return \App\Kernel::class;
+    }
 
     protected function setUp(): void
     {

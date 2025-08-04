@@ -3,12 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Product;
-use App\Entity\ProductReservationItem;
 use App\Repository\ProductReservationItemRepository;
 
 class ProductReservationsService
 {
-   public function __construct(private ProductReservationItemRepository $productReservationItemRepository){}
+   public function __construct(private readonly ProductReservationItemRepository $productReservationItemRepository){}
 
     public function getReservedProductsAmount(Product $product): int
     {
