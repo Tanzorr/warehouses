@@ -12,6 +12,6 @@ class ProductReservationsService
     public function getReservedProductsAmount(Product $product): int
     {
         $amount = $this->productReservationItemRepository->getProductsReservationItemsAmount($product);
-        return $amount || 0;
+        return $amount ?? 0;
     }
 }

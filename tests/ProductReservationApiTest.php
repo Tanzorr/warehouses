@@ -11,6 +11,7 @@ use App\Entity\Warehouse;
 use App\Entity\Stock; // Assuming you have a Stock entity to manage inventory.
 use App\Entity\StockAvailability;
 use Doctrine\ORM\EntityManagerInterface;
+use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -28,7 +29,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class ProductReservationApiTest extends ApiTestCase
 {
     // This trait resets the database before each test to ensure a clean state.
-//    use RefreshDatabaseTrait;
+    use RefreshDatabaseTrait;
 
     private ?EntityManagerInterface $entityManager;
 

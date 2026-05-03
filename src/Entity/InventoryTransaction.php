@@ -2,10 +2,8 @@
 
 namespace App\Entity;
 
-use AllowDynamicProperties;
 use Doctrine\ORM\Mapping as ORM;
 
-#[AllowDynamicProperties]
 #[ORM\Entity]
 class InventoryTransaction
 {
@@ -47,7 +45,7 @@ class InventoryTransaction
         ?int                $productId = null,
         ?int                $quantity = null,
         ?int                $userId = null
-        , ?string           $entitType = null
+        , ?string           $entityType = null
     )
     {
         $this->id = $id;
@@ -58,7 +56,7 @@ class InventoryTransaction
         $this->productId = $productId;
         $this->quantity = $quantity;
         $this->userId = $userId;
-        $this->entityType = $entitType ?? 'inventory_transaction';
+        $this->entityType = $entityType ?? 'inventory_transaction';
     }
 
     public function getId(): ?int

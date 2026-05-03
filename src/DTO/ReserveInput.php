@@ -21,6 +21,5 @@ class ReserveInput
 
     public function __construct()
     {
-        $this->comment = 'Example comment';
     }
 }
