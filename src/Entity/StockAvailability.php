@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\StockAvailabilityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: StockAvailabilityRepository::class)]
 class StockAvailability
@@ -23,6 +24,7 @@ class StockAvailability
     private ?Warehouse $warehouse = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?int $amount = null;
 
     public function getId(): ?int

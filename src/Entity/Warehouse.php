@@ -26,6 +26,7 @@ class Warehouse
     private ?string $name = null;
 
     #[ORM\Column(length: 1000)]
+    #[Assert\NotBlank]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]

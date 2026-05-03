@@ -21,6 +21,7 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         min:2,
         max:255,
@@ -30,6 +31,7 @@ class Product
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         min:2,
         max:255,
@@ -39,9 +41,12 @@ class Product
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private ?string $price = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $sku = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
