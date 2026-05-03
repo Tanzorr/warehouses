@@ -27,12 +27,11 @@ doctrine:
         controller_resolver:
             auto_mapping: false
 
-# удали комментарии если хочешь выполнять тесты на БД с префиксом test_]
-# when@test:
-#     doctrine:
-#         dbal:
-#             # "TEST_TOKEN" is typically set by ParaTest
-#             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+when@test:
+     doctrine:
+         dbal:
+             # "TEST_TOKEN" is typically set by ParaTest
+             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
     doctrine:

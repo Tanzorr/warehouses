@@ -33,7 +33,7 @@ final class ProductReservationTransitionProcessor implements ProcessorInterface
         $workflow = $this->workflowRegistry->get($productReservation, self::WORKFLOW_NAME);
 
         if (!$workflow->can($productReservation, $transition)) {
-            throw new InvalidArgumentException('worcflow->can($productReservation, $transition) is false');
+            throw new InvalidArgumentException('workflow->can($productReservation, $transition) is false');
             //throw new LogicException(sprintf('Cannot apply transition "%s" for product reservation with current status "%s".', $transition, $workflow->getMarking($productReservation)->getPlaces()));
         }
 
