@@ -66,6 +66,12 @@ readonly class StockAvailabilityService
         }
     }
 
+    public function releaseReservation(ProductReservation $reservation): void
+    {
+        // Pending reservations are not yet deducted from stock (deduction happens
+        // in commitReservation), so releasing one does not require restoring stock.
+    }
+
     public function getAvailableStock(Product $product):int
     {    $stocks = $this->repository->findByProductInStocks($product->getId());
         $allAmountInStocks = $this->getStocksAmount($stocks);
