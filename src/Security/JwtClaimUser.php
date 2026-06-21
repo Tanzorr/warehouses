@@ -19,7 +19,17 @@ final class JwtClaimUser implements UserInterface
     public function __construct(
         private readonly string $email,
         private readonly array $roles,
+        private readonly ?int $id = null,
     ) {
+    }
+
+    /**
+     * Laravel user id carried in the JWT "sub" claim — used to stamp inventory
+     * transactions with the operator who issued the command.
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     /**

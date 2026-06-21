@@ -19,7 +19,11 @@ final class JwtUserProvider implements PayloadAwareUserProviderInterface
 {
     public function loadUserByIdentifierAndPayload(string $identifier, array $payload): UserInterface
     {
-        return new JwtClaimUser($identifier, $this->rolesFromPayload($payload));
+        return new JwtClaimUser(
+            $identifier,
+            $this->rolesFromPayload($payload),
+            isset($payload['sub']) ? (int) $payload['sub'] : null,
+        );
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface

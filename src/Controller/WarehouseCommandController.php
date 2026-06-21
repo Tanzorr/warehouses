@@ -6,6 +6,7 @@ use App\Application\Command\AdjustStock\AdjustStockCommand;
 use App\Application\Command\CancelReservation\CancelReservationCommand;
 use App\Application\Command\TransferStock\TransferStockCommand;
 use App\Entity\StockAvailability;
+use App\Security\JwtClaimUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,7 +55,7 @@ class WarehouseCommandController extends AbstractController
                 warehouseId: (int) $data['warehouseId'],
                 quantity: (int) $data['quantity'],
                 comment: $data['comment'] ?? null,
-                userId: isset($data['userId']) ? (int) $data['userId'] : null,
+                userId: $this->currentUserId(),
             ));
         } catch (HandlerFailedException|\InvalidArgumentException $e) {
             return $this->json(['error' => $this->unwrapMessage($e)], 422);
@@ -88,13 +89,23 @@ class WarehouseCommandController extends AbstractController
                 toWarehouseId: (int) $data['toWarehouseId'],
                 quantity: (int) $data['quantity'],
                 comment: $data['comment'] ?? null,
-                userId: isset($data['userId']) ? (int) $data['userId'] : null,
+                userId: $this->currentUserId(),
             ));
         } catch (HandlerFailedException|\InvalidArgumentException $e) {
             return $this->json(['error' => $this->unwrapMessage($e)], 422);
         }
 
         return $this->json(['message' => 'Stock transferred']);
+    }
+
+    /**
+     * Laravel user id from the verified JWT, stamped onto inventory transactions.
+     */
+    private function currentUserId(): ?int
+    {
+        $user = $this->getUser();
+
+        return $user instanceof JwtClaimUser ? $user->getId() : null;
     }
 
     private function unwrapMessage(HandlerFailedException|\InvalidArgumentException $e): string
