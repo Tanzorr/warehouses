@@ -26,6 +26,6 @@ RUN chmod 0644 /etc/cron.d/cron-schedule
 
 RUN crontab /etc/cron.d/cron-schedule
 
-RUN apt-get update && apt-get install -y libcurl4-openssl-dev pkg-config libpcre3-dev  && docker-php-ext-install curl
+RUN apt-get update && apt-get install -y libcurl4-openssl-dev pkg-config && docker-php-ext-install curl
 
 CMD ["sh", "-c", "cron && php-fpm"]

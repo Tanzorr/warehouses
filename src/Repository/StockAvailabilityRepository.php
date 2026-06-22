@@ -24,6 +24,14 @@ class StockAvailabilityRepository extends ServiceEntityRepository
         );
     }
 
+    public function findByProductAndWarehouse(int $productId, int $warehouseId): ?StockAvailability
+    {
+        return $this->findOneBy([
+            'product' => $productId,
+            'warehouse' => $warehouseId,
+        ]);
+    }
+
     public function save(StockAvailability $stockAvailability): void
     {
         $this->getEntityManager()->persist($stockAvailability);
